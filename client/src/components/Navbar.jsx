@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-
+import logo from '../assets/Flat Vector Logo with Vibrant Greens (1).png'
 export default function Navbar() {
   const [isDark, setIsDark] = useState(false);
   const [sidebarToggle, setSidebarToggle] = useState(false);
@@ -91,7 +91,9 @@ useEffect(() => {
               after:content-[''] after:absolute ${!sidebarToggle ? "after:w-5":"after:w-8"} after:h-1 after:bg-black after:left-0 after:top-2 after:transition-all after:duration-100`}
             ></span>
           </button>
-          <span className="text-lg font-bold">Logo</span>
+          <span className="text-lg font-bold">
+            <img className="h-[60px] w-[60px] rounded-xl " src={logo} alt="neurologo" />
+          </span>
         </div>
 
         {/* Center: Search */}
@@ -170,6 +172,7 @@ useEffect(() => {
           sidebarToggle ? "w-[256px] p-3" : "w-0 p-0"
         }`}
       >
+        <p className="text-3xl font-bold p-2 pb-3">Neuro <span className="text-violet-700">Nest</span></p>
         <div ref={containerRef} className="relative flex flex-col gap-2 h-full">
           {/* Highlight bar */}
           <div
