@@ -100,3 +100,22 @@ export const logOutUser = asyncHandler(async(req,res)=>{
             .clearCookie("refreshToken", options)
             .json({data : {},message: "User logged out successfully"})
 })
+
+export const uploadAvatar = asyncHandler(async(req,res)=>{
+    const {user} = req;
+    if(!req.file) {
+        throw new ApiError(400, "Please upload an image");
+    }
+    console.log("req.file", req.file);
+    
+    const uploadedImage = await uploadOnCloudinary(req.file.buffer, `avatars/${user._id}`);
+
+    const updatedUser = await User.findByIdAndUpdate(user._id, {
+        avatar: uploadedImage.secure_url
+    }, {
+        new: true,
+        runValidators: true
+    });
+
+    return res.status(200).json({updatedUser, message: "Avatar uploaded successfully"});
+});
