@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { isValidObjectId } from "mongoose";
 
 const getAccessAndRefreshToken = async (userId)=>{
     const user = await User.findById(userId);
@@ -119,3 +120,16 @@ export const uploadAvatar = asyncHandler(async(req,res)=>{
 
     return res.status(200).json({updatedUser, message: "Avatar uploaded successfully"});
 });
+
+export const getUserProfile = asyncHandler(async(req,res)=>{
+    const userId = req.user?._id;
+    if(!userId || !isValidObjectId(userId)) {       
+        throw new ApiError(400, "User not found");
+    }
+
+    const user = await User.findById(userId).select("-password -refreshToken");
+    if(!user) {      
+        throw new ApiError(404, "User not found");
+    }
+    return res.status(200).json({user, message: "User profile fetched successfully"});
+})
