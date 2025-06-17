@@ -1,4 +1,6 @@
 import {Schema, model} from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new Schema({
     fullName:{
@@ -19,8 +21,8 @@ const userSchema = new Schema({
     },
     role:{
         type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
+        enum: ['student', 'instuctor'],
+        default: 'student'
     },
     avatar:{
         type: String,
@@ -73,4 +75,4 @@ userSchema.methods.getRefreshToken = function () {
   return token;
 }
 
-export const User = mongoose.model("User", userSchema);
+export const User = model("User", userSchema);
