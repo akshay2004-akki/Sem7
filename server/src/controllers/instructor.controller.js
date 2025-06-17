@@ -1,7 +1,9 @@
-import { Instructor } from "../models/instructor.model";
-import { ApiError } from "../utils/ApiError";
-import asyncHandler from "../utils/asyncHandler";
-import { User } from "../models/user.model";
+import { Instructor } from "../models/instructor.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import { User } from "../models/user.model.js";
+import { isValidObjectId } from "mongoose";
+import { Course } from "../models/courses.model.js";
 
 
 export const createInstructorProfile = asyncHandler(async(req,res)=>{
@@ -73,7 +75,7 @@ export const getInstructorById = asyncHandler(async(req,res)=>{
 });
 
 export const getAllInstructors = asyncHandler(async(req,res)=>{
-    const instructors = await Instructor.find({}).populate("instructorId","fullName email avatar");
+    const instructors = await Instructor.find({}).populate("instructorId",);
     if(!instructors || instructors.length === 0){
         throw new ApiError(404, "No instructors found");
     }
@@ -126,6 +128,25 @@ export const deleteInstructorProfile = asyncHandler(async(req,res)=>{
 
     return res.status(200).json({
         message: "Instructor profile deleted successfully"
+    });
+});
+
+export const getInstructorCourses = asyncHandler(async(req,res)=>{
+    const {instructorId} = req.params;
+    if(!instructorId || !isValidObjectId(instructorId)){    
+        throw new ApiError(400, "Invalid instructor ID");
+    }
+
+    const courses = await Course.find({instructorId});
+    if(!courses || courses.length === 0){
+        return res.status(404).json({
+            message: "No courses found for this instructor"
+        });
+    }
+
+    return res.status(200).json({
+        courses,
+        message: "Courses fetched successfully"
     });
 });
 

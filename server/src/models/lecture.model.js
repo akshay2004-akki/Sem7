@@ -21,3 +21,5 @@ const lectureSchema = new Schema({
         default: 0
     },
 })
+
+export const Lecture = model("Lecture", lectureSchema);

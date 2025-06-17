@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const instructorSchema = new Schema({
     instructorId :{
-        type : mongoose.Schema.Types.ObjectId,
+        type : Schema.Types.ObjectId,
         ref: 'User',
     },
     bio:{
