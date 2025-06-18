@@ -11,7 +11,7 @@ const sectionSchema = new Schema({
         ref: 'Course',
         required: true
     },
-    lectrues:[{
+    lectures:[{
         type: Schema.Types.ObjectId,
         ref: 'Lecture',
     }],

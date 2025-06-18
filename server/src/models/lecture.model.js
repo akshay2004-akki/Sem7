@@ -6,6 +6,11 @@ const lectureSchema = new Schema({
         enum: ['video', 'quiz', 'text'],
         required: true
     },
+    title :{
+        type: String,
+        required: true,
+        trim: true
+    },
     content : {
         type: String,
         required: true,
@@ -22,4 +27,4 @@ const lectureSchema = new Schema({
     },
 })
 
-export const Lecture = model("Lecture", lectureSchema);
+export const Lecture = model("Lecture", lectureSchema); 

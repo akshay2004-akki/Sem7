@@ -2,23 +2,30 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Course } from "../models/courses.model.js";
 import { isValidObjectId } from "mongoose";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+
 
 export const createCourse = asyncHandler(async(req,res)=>{
     const userId = req.user?._id;
-    const { title, description, category, thumbnail, price, language } = req.body;
-
+    const { title, description, category, price, language } = req.body;
     if(!userId || !isValidObjectId(userId)){
         throw new ApiError(400, "Invalid user ID");
     }
     if(!title || !description || !category || !thumbnail || !price || !language){
         throw new ApiError(400, "All fields are required");
     }
+
+    const uploadedImage = await uploadOnCloudinary(
+        req.file.buffer,
+        `thumbnail/${userId}`
+      );
+
     const newCourse = await Course.create({
         title,
         instructorId: userId,
         description,
         category,
-        thumbnail,
+        thumbnail : uploadedImage.secure_url,
         price,
         language
     });
@@ -34,7 +41,7 @@ export const createCourse = asyncHandler(async(req,res)=>{
 export const updateCourse = asyncHandler(async(req,res)=>{
     const {courseId} = req.params;
     const userId = req.user?._id;
-    const { title, description, category, thumbnail, price, language } = req.body;
+    const { title, description, category, price, language } = req.body;
     if(!courseId || !isValidObjectId(courseId)){
         throw new ApiError(400, "Invalid course ID");
     }
@@ -48,11 +55,15 @@ export const updateCourse = asyncHandler(async(req,res)=>{
     if(course.instructorId.toString() !== userId.toString()){
         throw new ApiError(403, "You are not authorized to update this course");
     }
+    const uploadedImage = await uploadOnCloudinary(
+        req.file.buffer,
+        `thumbnail/${userId}`
+      );
     const updatedCourse = await Course.findByIdAndUpdate(courseId, {
         title,
         description,
         category,
-        thumbnail,
+        thumbnail : uploadedImage.secure_url,
         price,
         language
     }, { new: true });
