@@ -11,6 +11,6 @@ router.get('/getAllCourses', getAllCourses);
 router.get('/getCourseById/:courseId', getCourseById);
 router.delete('/deleteCourse/:courseId', verifyJWT, deleteCourse);
 router.get('/browseCourses', browseCourses);
-router.get('/getInstructorCourses/:instructorId',verifyJWT ,getInstructorCourses);
+router.get('/getInstructorCourses/:instructorId',verifyJWT ,getInstructorCourses); 
 
 export default router; 

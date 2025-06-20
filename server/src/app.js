@@ -15,17 +15,21 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }))
 
-app.use(express.json({limit:"20kb"}))
-app.use(express.urlencoded({extended:true, limit:"20kb"}))
+app.use(express.json({limit:"500gb"}))
+app.use(express.urlencoded({extended:true, limit:"500gb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
 import userRoutes from './routes/user.routes.js';
 import instructorRoutes from './routes/instructor.routes.js';
 import courseRoutes from './routes/course.routes.js';
+import sectionRoutes from './routes/section.routes.js';
+import lectureRoutes from './routes/lecture.routes.js';
 
 app.use('/api/v1/users', userRoutes);
-app.use('api/v1/instructor', instructorRoutes);
+app.use('/api/v1/instructor', instructorRoutes);
 app.use('/api/v1/courses',courseRoutes)
+app.use('/api/v1/sections', sectionRoutes);
+app.use('/api/v1/lectures', lectureRoutes);
 
-export default app;
+export default app; 

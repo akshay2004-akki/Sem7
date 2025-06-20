@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const lectureSchema = new Schema({
     type: {
         type: String,
-        enum: ['video', 'quiz', 'text'],
+        enum: ['video', 'quiz', 'text'], 
         required: true
     },
     title :{

@@ -14,7 +14,8 @@ const sectionSchema = new Schema({
     lectures:[{
         type: Schema.Types.ObjectId,
         ref: 'Lecture',
+        default: []
     }],
 })
 
-export const Section = model("Section", sectionSchema);
+export const Section = model("Section", sectionSchema); 

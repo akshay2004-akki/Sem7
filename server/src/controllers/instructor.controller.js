@@ -15,7 +15,7 @@ export const createInstructorProfile = asyncHandler(async(req,res)=>{
     }
 
     if(!bio){
-        throw new ApiError(400, "Bio is required");
+        throw new ApiError(400, "Bio is required"); 
     }
 
     const existingInstructor = await Instructor.findOne({instructorId: userId});

@@ -1,11 +1,11 @@
-import asyncHandler from "../utils/asyncHandler";
+import asyncHandler from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Section } from "../models/section.model.js";
 import { isValidObjectId } from "mongoose";
 import { Course } from "../models/courses.model.js";
 
 
-export const addSection = asyncHandler(async(eeq,res)=>{
+export const addSection = asyncHandler(async(req,res)=>{
     const {courseId} = req.params;
     const userId = req.user?._id;
     const {title} = req.body;

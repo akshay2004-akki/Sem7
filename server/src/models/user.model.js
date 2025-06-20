@@ -30,7 +30,8 @@ const userSchema = new Schema({
     },
     enrolledCourses: [{
         type: Schema.Types.ObjectId,
-        ref: 'Course'
+        ref: 'Course',
+        default: []
     }],
     refreshToken:{
         type: String

@@ -1,16 +1,16 @@
 import {Section} from '../models/section.model.js';
 import {Lecture} from '../models/lecture.model.js';
-import asyncHandler from 'express-async-handler';
+import asyncHandler from '../utils/asyncHandler.js';
 import {ApiError} from '../utils/ApiError.js';
 import {isValidObjectId} from 'mongoose';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import {Quiz} from '../models/quiz.model.js';
 
 
-export const addLecture = async (req, res) => {
+export const addLecture = asyncHandler(async (req, res) => {
   try {
-    const { type, duration } = req.body;
-    const sectionId = req.params.sectionId;
+    const { type, duration, title } = req.body; 
+    const {sectionId} = req.params;
 
     if (!['video', 'quiz', 'text'].includes(type)) {
       return res.status(400).json({ message: "Invalid lecture type" });
@@ -31,13 +31,14 @@ export const addLecture = async (req, res) => {
       finalContent = req.body.content;
     }
 
-    const lecture = new Lecture({
+    const lecture = await Lecture.create({
       sectionId,
       type,
+      title,
       content: finalContent,
       duration: duration || 0,
     });
-    await lecture.save();
+    
 
     if (type === 'quiz') {
       const { quiz } = req.body; // quiz = { questions: [...] }
@@ -65,7 +66,7 @@ export const addLecture = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
-};
+});
 
 export const getLecture = asyncHandler(async(res,req)=>{
     const {lectureId} = req.params;
@@ -89,10 +90,10 @@ export const getLecture = asyncHandler(async(res,req)=>{
     });
 })
 
-export const updateLecture = async (req, res) => {
+export const updateLecture = asyncHandler(async (req, res) => {
   try {
     const { lectureId } = req.params;
-    const { type, content, duration } = req.body;
+    const { type, content, duration, title } = req.body;
 
     const lecture = await Lecture.findById(lectureId);
     if (!lecture) {
@@ -103,16 +104,17 @@ export const updateLecture = async (req, res) => {
       return res.status(400).json({ message: "Invalid lecture type" });
     }
 
+    if(title) lecture.title = title;
     if (type) lecture.type = type;
     if (duration) lecture.duration = duration;
 
     if (type === 'video') {
       if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          resource_type: "video",
-          folder: "lectures",
-        });
-        lecture.content = result.secure_url;
+        const uploadedVideo = await uploadOnCloudinary(
+            req.file.buffer,
+            `lectures/${lectureId}`
+        );
+        lecture.content = uploadedVideo.secure_url;
       }
     } else if (type === 'text') {
       lecture.content = content;
@@ -142,4 +144,56 @@ export const updateLecture = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
-};
+})
+
+export const deleteLecture = asyncHandler(async (req, res) => {
+  try {
+    const { lectureId } = req.params;
+
+    const lecture = await Lecture.findById(lectureId);
+    if (!lecture) {
+      return res.status(404).json({ message: "Lecture not found" });
+    }
+
+    await Lecture.findByIdAndDelete(lectureId);
+
+    if (lecture.type === 'quiz') {
+      await Quiz.findOneAndDelete({ lectureId: lectureId });
+    }
+
+    // Remove from Section
+    await Section.findByIdAndUpdate(
+      lecture.sectionId,
+      { $pull: { lectures: lecture._id } }
+    );
+
+    res.json({ message: "Lecture deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+})
+
+export const getLectureById = asyncHandler(async (req, res) => {
+  const { lectureId } = req.params;
+
+  if (!lectureId || !isValidObjectId(lectureId)) {
+    throw new ApiError(400, "Invalid lecture ID");
+  }
+
+  const lecture = await Lecture.findById(lectureId);
+  if (!lecture) {
+    throw new ApiError(404, "Lecture not found");
+  }
+
+  let quiz = null;
+  if (lecture.type === "quiz") {
+    quiz = await Quiz.findOne({ lectureId: lecture._id });
+  }
+
+  return res.status(200).json({
+    lecture,
+    quiz,
+    message: "Lecture fetched successfully"
+  });
+});
