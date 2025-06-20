@@ -16,4 +16,6 @@ const progressSchema = new Schema({
         ref: 'User',
         required: true
     },
-})
+});
+
+export const Progress = model("Progress", progressSchema);
