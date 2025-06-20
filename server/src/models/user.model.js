@@ -33,6 +33,11 @@ const userSchema = new Schema({
         ref: 'Course',
         default: []
     }],
+    wishlist: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Course',
+        default: []
+    }],
     refreshToken:{
         type: String
     }

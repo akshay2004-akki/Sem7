@@ -25,11 +25,13 @@ import instructorRoutes from './routes/instructor.routes.js';
 import courseRoutes from './routes/course.routes.js';
 import sectionRoutes from './routes/section.routes.js';
 import lectureRoutes from './routes/lecture.routes.js';
+import wishlistRoutes from './routes/wishlist.routes.js';
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/instructor', instructorRoutes);
 app.use('/api/v1/courses',courseRoutes)
 app.use('/api/v1/sections', sectionRoutes);
 app.use('/api/v1/lectures', lectureRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
 
 export default app; 
