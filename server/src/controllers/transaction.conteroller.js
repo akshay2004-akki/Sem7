@@ -5,37 +5,45 @@ import {User} from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { isValidObjectId } from "mongoose";
 import { razorpay } from "../utils/razorpay.js";
+import crypto from "crypto";
 
 
 export const createTransaction = asyncHandler(async(req,res)=>{
-    const userId = req.user?._id;
-    const {courseId} = req.params;
-
-    if(!isValidObjectId(courseId)) {
-        throw new ApiError(400, "Invalid course ID");
+    try {
+        const userId = req.user?._id;
+        const {courseId} = req.params;
+    
+        if(!isValidObjectId(courseId)) {
+            throw new ApiError(400, "Invalid course ID");
+        }
+        if(!isValidObjectId(userId)) {
+            throw new ApiError(400, "Invalid user ID");
+        }
+        const course = await Course.findById(courseId);
+        if(!course) {
+            throw new ApiError(404, "Course not found");
+        }
+    
+        const order = await razorpay.orders.create({
+            amount : course.price * 100,
+            currency: "INR",
+            receipt: `order_rcptid_${Date.now()}`,
+        })
+    
+        res.status(201).json({
+          success: true,
+          orderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          key: process.env.RAZOR_PAY_KEY_ID,
+        });
+    } catch (error) {
+        console.log("Error creating transaction:", error);
+        throw new ApiError(500, "Failed to create transaction");
+        
     }
-    if(!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user ID");
-    }
-    const course = await Course.findById(courseId);
-    if(!course) {
-        throw new ApiError(404, "Course not found");
-    }
-
-    const order = await razorpay.orders.create({
-        amount : course.price * 100,
-        currency: "INR",
-        receipt: `order_rcptid_${Date.now()}`,
-    })
-
-    res.status(201).json({
-      success: true,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      key: process.env.RAZOR_PAY_KEY_ID,
-    });
 })
+
 
 export const verifyTransaction = asyncHandler(async (req, res) => {
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
@@ -45,38 +53,39 @@ export const verifyTransaction = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid payment details");
   }
 
-  // ✅ verify signature
-  const isValidSignature = razorpay.utils.verifyPaymentSignature({
-    order_id: razorpay_order_id,
-    payment_id: razorpay_payment_id,
-    signature: razorpay_signature,
-  });
+  // ✅ Create expected signature using crypto HMAC
+  const generated_signature = crypto
+    .createHmac("sha256", process.env.RAZOR_PAY_KEY_SECRET)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
 
-  if (!isValidSignature) {
+  if (generated_signature !== razorpay_signature) {
     throw new ApiError(400, "Invalid payment signature");
   }
 
-  // ✅ get course price from DB
+  // ✅ Get course price from DB
   const course = await Course.findById(courseId);
   if (!course) {
     throw new ApiError(404, "Course not found");
   }
 
-  // ✅ save transaction
+  // ✅ Save transaction
   const transaction = await Transaction.create({
     user: req.user._id,
     course: courseId,
-    price: course.price, // correct way!
-    status: 'completed',
+    price: parseFloat(course.price), // ensure it's a number
+    status: "completed",
     paymentId: razorpay_payment_id,
     orderId: razorpay_order_id,
     signature: razorpay_signature,
   });
 
-  // ✅ mark course as enrolled
+  // ✅ Enroll user in course
   const user = await User.findById(req.user._id);
-  user.enrolledCourses.push(courseId);
-  await user.save();
+  if (!user.enrolledCourses.includes(courseId)) {
+    user.enrolledCourses.push(courseId);
+    await user.save();
+  }
 
   res.status(201).json({
     success: true,

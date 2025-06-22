@@ -27,9 +27,15 @@ const courseSchema = new Schema({
         trim: true
     },
     price : {
-        type: String,
+        type: Number,
         required: true,
         default: 0
+    },
+    currency : {
+        type: String,
+        required: true,
+        default: "INR",
+        trim: true
     },
     language : {
         type: String,
