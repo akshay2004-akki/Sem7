@@ -30,7 +30,7 @@ export const createTransaction = asyncHandler(async(req,res)=>{
             receipt: `order_rcptid_${Date.now()}`,
         })
     
-        res.status(201).json({
+        return res.status(201).json({
           success: true,
           orderId: order.id,
           amount: order.amount,
@@ -87,7 +87,7 @@ export const verifyTransaction = asyncHandler(async (req, res) => {
     await user.save();
   }
 
-  res.status(201).json({
+  return res.status(201).json({
     success: true,
     message: "Transaction verified successfully",
     transaction,
