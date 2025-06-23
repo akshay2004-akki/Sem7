@@ -6,3 +6,5 @@ const router = Router();
 
 router.post('/update', verifyJWT, updateProgress);
 router.get('/:userId/:courseId', verifyJWT, getCourseProgress);
+
+export default router;

@@ -1,5 +1,5 @@
 import { isValidObjectId } from "mongoose";
-import { Progress } from "../models/progress.model";
+import { Progress } from "../models/progress.model.js";
 import {ApiError} from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js';
 
@@ -69,4 +69,4 @@ export const getCourseProgress = async (req, res) => {
     console.error("Error fetching course progress:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-};
+}; 

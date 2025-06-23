@@ -27,6 +27,8 @@ import sectionRoutes from './routes/section.routes.js';
 import lectureRoutes from './routes/lecture.routes.js';
 import wishlistRoutes from './routes/wishlist.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
+import progressRoutes from './routes/progress.routes.js';
+import reviewRoutes from './routes/review.routes.js';
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/instructor', instructorRoutes);
@@ -35,5 +37,8 @@ app.use('/api/v1/sections', sectionRoutes);
 app.use('/api/v1/lectures', lectureRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/transaction', transactionRoutes);
+app.use('/api/v1/progress', progressRoutes); 
+app.use('/api/v1/reviews', reviewRoutes);  
+
 
 export default app; 
