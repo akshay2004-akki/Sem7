@@ -142,7 +142,7 @@ export const getUserProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User not found");
   }
 
-  const user = await User.findById(userId).select("-password -refreshToken");
+  const user = await User.findById(userId).select("-password -refreshToken").populate("wishlist");
   if (!user) {
     throw new ApiError(404, "User not found");
   }

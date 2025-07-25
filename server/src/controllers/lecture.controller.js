@@ -7,10 +7,11 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import {Quiz} from '../models/quiz.model.js';
 
 
+
 export const addLecture = asyncHandler(async (req, res) => {
   try {
-    const { type, duration, title } = req.body; 
-    const {sectionId} = req.params;
+    const { type, duration, title } = req.body;
+    const { sectionId } = req.params;
 
     if (!['video', 'quiz', 'text'].includes(type)) {
       return res.status(400).json({ message: "Invalid lecture type" });
@@ -19,13 +20,15 @@ export const addLecture = asyncHandler(async (req, res) => {
     let finalContent = "";
 
     if (type === 'video') {
-      if (!req.file) {
+      if (!req.file || !req.file.path) {
         return res.status(400).json({ message: "Video file required" });
       }
+
       const uploadedVideo = await uploadOnCloudinary(
-            req.file.buffer,
-            `lectures/${sectionId}`
-        );
+        req.file.path,
+        `lectures/${sectionId}`
+      );
+
       finalContent = uploadedVideo.secure_url;
     } else if (type === 'text') {
       finalContent = req.body.content;
@@ -38,17 +41,18 @@ export const addLecture = asyncHandler(async (req, res) => {
       content: finalContent,
       duration: duration || 0,
     });
-    
 
     if (type === 'quiz') {
-      const { quiz } = req.body; // quiz = { questions: [...] }
+      const { quiz } = req.body;
       if (!quiz || !quiz.questions) {
         return res.status(400).json({ message: "Quiz data required" });
       }
+
       const newQuiz = new Quiz({
         questions: quiz.questions,
-        lectureId: lecture._id
+        lectureId: lecture._id,
       });
+
       await newQuiz.save();
     }
 
@@ -63,7 +67,7 @@ export const addLecture = asyncHandler(async (req, res) => {
 
     res.status(201).json(lecture);
   } catch (err) {
-    console.error(err);
+    console.error("Error adding lecture:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
