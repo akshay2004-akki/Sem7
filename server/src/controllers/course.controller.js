@@ -160,7 +160,7 @@ export const getAllCourses = asyncHandler(async (req, res) => {
 
 export const browseCourses = asyncHandler(async (req, res) => {
   try {
-    const { search, category, price, rating } = req.query;
+    const { search } = req.query;
 
     const courses = await Course.find({
       title: { $regex: search, $options: "i" },
@@ -170,4 +170,8 @@ export const browseCourses = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+export const enrollInCourse = asyncHandler(async(req,res)=>{
+  const {courtseId} = req.params
+})
 
