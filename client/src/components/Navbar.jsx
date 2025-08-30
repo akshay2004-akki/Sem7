@@ -25,8 +25,7 @@ export default function Navbar() {
 //   },[])
 const tabs = [
     { title: "Dashboard", icon: Home },
-    { title: "Notifications", icon: Bell },
-    { type: "separator"},
+    { title: "Notifications", icon: Bell }, 
     { title: "Settings", icon: Settings },
     { title: "Support", icon: HelpCircle },
     { title: "Security", icon: Shield }, 
@@ -44,9 +43,9 @@ const tabs = [
             <ExpandedTabs tabs={tabs} />
         </div>
 
-        <div className='w-[100px] bg-amber-300'>
-            profile
-        </div>
+        <button className='bg-amber-300 rounded-full'>
+            <img src="" alt="" className='rounded-full h-[45px] w-[45px] ' />
+        </button>
 
         {/* <div className='w-[240px] bg-amber-300'>
 
