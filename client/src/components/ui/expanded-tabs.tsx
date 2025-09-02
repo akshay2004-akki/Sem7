@@ -2,6 +2,7 @@ import * as React from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { LucideIcon } from "lucide-react"
 import { useOnClickOutside } from "usehooks-ts"
+import { NavLink } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
 
@@ -113,7 +114,7 @@ export function ExpandedTabs({
                   transition={transition}
                   className="overflow-hidden"
                 >
-                  {tab.title}
+                  <NavLink to={`${tab.link}`}>{tab.title}</NavLink>
                 </motion.span>
               )}
             </AnimatePresence>
