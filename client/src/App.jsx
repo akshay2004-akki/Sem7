@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Dashboard from './components/Dashboard'
 import Hero from './components/Hero'
+import { ThemeProvider } from 'next-themes'
 
 function App() {
 
@@ -10,7 +11,10 @@ function App() {
   return (
     <>
        <Router>
-        <Navbar/>
+        <ThemeProvider>        
+          <Navbar/>
+          </ThemeProvider>
+
         <Routes>
           <Route path='/' element={<>
           <Hero/>
