@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
-@import "tw-animate-css";
+/* ✅ removed @plugin line */
 
 @custom-variant dark (&:is(.dark *));
 
