@@ -39,7 +39,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="h-14 flex items-center backdrop-blur-[2px] justify-between px-3 dark:border-gray-700 fixed w-full z-50">
+    <header className="h-14 flex items-center backdrop-blur-[3px] justify-between px-3 dark:border-gray-700 fixed w-full z-50">
       <div className="w-auto">
         <img src={logo} alt="Logo" className="h-12 rounded" />
       </div>

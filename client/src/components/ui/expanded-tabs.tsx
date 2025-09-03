@@ -1,30 +1,30 @@
-import * as React from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { LucideIcon } from "lucide-react"
-import { useOnClickOutside } from "usehooks-ts"
-import { NavLink } from "react-router-dom"
+import * as React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { LucideIcon } from "lucide-react";
+import { useOnClickOutside } from "usehooks-ts";
+import { NavLink } from "react-router-dom";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface Tab {
-  title: string
-  icon: LucideIcon
-  type?: never
+  title: string;
+  icon: LucideIcon;
+  type?: never;
 }
 
 interface Separator {
-  type: "separator"
-  title?: never
-  icon?: never
+  type: "separator";
+  title?: never;
+  icon?: never;
 }
 
-type TabItem = Tab | Separator
+type TabItem = Tab | Separator;
 
 interface ExpandedTabsProps {
-  tabs: TabItem[]
-  className?: string
-  activeColor?: string
-  onChange?: (index: number | null) => void
+  tabs: TabItem[];
+  className?: string;
+  activeColor?: string;
+  onChange?: (index: number | null) => void;
 }
 
 const buttonVariants = {
@@ -38,15 +38,15 @@ const buttonVariants = {
     paddingLeft: isSelected ? "1rem" : ".5rem",
     paddingRight: isSelected ? "1rem" : ".5rem",
   }),
-}
+};
 
 const spanVariants = {
   initial: { width: 0, opacity: 0 },
   animate: { width: "auto", opacity: 1 },
   exit: { width: 0, opacity: 0 },
-}
+};
 
-const transition = { delay: 0.1, type: "spring", bounce: 0, duration: 0.6 }
+const transition = { delay: 0.1, type: "spring", bounce: 0, duration: 0.6 };
 
 export function ExpandedTabs({
   tabs,
@@ -54,39 +54,36 @@ export function ExpandedTabs({
   activeColor = "text-primary",
   onChange,
 }: ExpandedTabsProps) {
-  const [selected, setSelected] = React.useState<number | null>(null)
+  const [selected, setSelected] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef<HTMLDivElement>(
     null as unknown as HTMLDivElement
-  )
+  );
 
   useOnClickOutside(outsideClickRef, () => {
-    setSelected(null)
-    onChange?.(null)
-  })
+    setSelected(null);
+    onChange?.(null);
+  });
 
   const handleSelect = (index: number) => {
-    setSelected(index)
-    onChange?.(index)
-  }
+    setSelected(index);
+    onChange?.(index);
+  };
 
   const Separator = () => (
     <div className=" h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
-  )
+  );
 
   return (
     <div
       ref={outsideClickRef}
-      className={cn(
-        " flex gap-2 rounded-2xl border bg-background p-1 shadow-sm ",
-        className
-      )}
+      className={cn(" flex gap-2 rounded-2xl bg-transparent p-1 ", className)}
     >
       {tabs.map((tab, index) => {
         if (tab.type === "separator") {
-          return <Separator key={`separator-${index}`} />
+          return <Separator key={`separator-${index}`} />;
         }
 
-        const Icon = tab.icon
+        const Icon = tab.icon;
         return (
           <motion.button
             key={tab.title}
@@ -97,13 +94,20 @@ export function ExpandedTabs({
             onClick={() => handleSelect(index)}
             transition={transition}
             className={cn(
-              "relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-300",
+              "group relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors bg-transparent duration-300",
               selected === index
-                ? cn("bg-muted", activeColor)
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? cn("bg-transparent", activeColor)
+                : "text-muted-foreground  hover:text-foreground"
             )}
           >
-            <Icon size={20} />
+            <Icon
+              size={20}
+              className={cn(
+                "text-white transition-colors duration-300",
+                "group-hover:text-[#00ffff]",
+                selected === index ? "text-[#00ffff]" : "text-white"
+              )}
+            />
             <AnimatePresence initial={false}>
               {selected === index && (
                 <motion.span
@@ -112,15 +116,15 @@ export function ExpandedTabs({
                   animate="animate"
                   exit="exit"
                   transition={transition}
-                  className="overflow-hidden"
+                  className="overflow-hidden text-[#00ffff]"
                 >
                   <NavLink to={`${tab.link}`}>{tab.title}</NavLink>
                 </motion.span>
               )}
             </AnimatePresence>
           </motion.button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
