@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Dashboard from './components/Dashboard'
 import Hero from './components/Hero'
 import { ThemeProvider } from 'next-themes'
+import Featured from './components/Featured'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path='/' element={<>
           <Hero/>
+          <Featured/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>

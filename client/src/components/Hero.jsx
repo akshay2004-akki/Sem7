@@ -4,17 +4,22 @@ import heroLogo from "../assets/herologo.png";
 function Hero() {
   return (
     <>
-      <section className="relative overflow-hidden bg-black sm:pb-16 lg:pb-20 xl:pb-24">
+      <section className="relative overflow-hidden bg-black sm:pb-16 lg:pb-20 xl:pb-24 h-[105vh]">
         <div className="mx-auto p-5 w-full relative sm:px-6 lg:px-8 max-w-7xl">
           <div className="w-full h-auto grid grid-cols-1 lg:grid-cols-2 pt-28 place-items-center gap-12 lg:gap-20">
-            
             {/* Child 1: The Text Column */}
             <div>
               <h1 className="text-4xl font-normal text-white sm:text-5xl lg:text-6xl xl:text-7xl">
-                Your Digital Nest for Smarter <span className="text-[#00ffff]">Learning</span>.
+                Your Digital Nest for Smarter{" "}
+                <span className="text-[#00ffff]">Learning</span>.
               </h1>
               <p className="mt-4 text-lg font-normal text-gray-400 sm:mt-8">
-                <span className="text-[#00ffff]">Neuronest</span> is your digital nest for smarter learning — an online platform designed to make education engaging, accessible, and personalized. With interactive courses, real-time learning tools, and a modern interface, Neuronest helps learners build knowledge step by step and achieve their goals with confidence.
+                <span className="text-[#00ffff]">Neuronest</span> is your
+                digital nest for smarter learning — an online platform designed
+                to make education engaging, accessible, and personalized. With
+                interactive courses, real-time learning tools, and a modern
+                interface, Neuronest helps learners build knowledge step by step
+                and achieve their goals with confidence.
               </p>
             </div>
 
@@ -51,7 +56,7 @@ function Hero() {
 
               {/* Hero image */}
               <img
-                className="relative w-full max-w-md mx-auto z-10"
+                className="relative w-full max-w-md mx-auto z-10 shadow-none"
                 src={heroLogo}
                 alt="Neuronest Hero"
               />
