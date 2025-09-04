@@ -50,9 +50,10 @@ function Featured() {
         <h1 className="text-4xl sm:text-5xl font-bold mb-4">
           Featured <span className="text-[#00ffff]">Courses</span>
         </h1>
-        <p className="text-gray-300 max-w-xl mx-auto">
-          Discover top-rated courses with expert instructors and engaging lessons.
-        </p>
+        <p className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed">
+  Discover top-rated courses with expert instructors and engaging lessons.
+</p>
+
 
         <div className="mt-5 w-full">
           <CardCarousel
