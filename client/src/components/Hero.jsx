@@ -4,7 +4,7 @@ import heroLogo from "../assets/herologo.png";
 function Hero() {
   return (
     <>
-      <section className="relative overflow-hidden bg-black sm:pb-16 lg:pb-20 xl:pb-24 h-[105vh]">
+      <section className="relative sm:h-[105vh] overflow-hidden bg-black sm:pb-16 lg:pb-20 xl:pb-24 h-[125vh]">
         <div className="mx-auto p-5 w-full relative sm:px-6 lg:px-8 max-w-7xl">
           <div className="w-full h-auto grid grid-cols-1 lg:grid-cols-2 pt-28 place-items-center gap-12 lg:gap-20">
             {/* Child 1: The Text Column */}

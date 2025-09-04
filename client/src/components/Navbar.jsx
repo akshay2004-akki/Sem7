@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 import { useState, useRef, useEffect } from "react";
 import logo from "../assets/Flat Vector Logo with Vibrant Greens (1).png";

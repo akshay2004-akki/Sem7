@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard'
 import Hero from './components/Hero'
 import { ThemeProvider } from 'next-themes'
 import Featured from './components/Featured'
+import PopularCategories from './components/PopularCategories'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path='/' element={<>
           <Hero/>
           <Featured/>
+          <PopularCategories/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>

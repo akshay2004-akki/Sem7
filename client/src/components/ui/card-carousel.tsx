@@ -74,21 +74,22 @@ export const CardCarousel: React.FC<CarouselProps> = ({
           <div className="flex w-full items-center justify-center gap-4">
             <div className="w-full">
               <Swiper
-                spaceBetween={50}
+                spaceBetween={100} // controls gap between cards
                 autoplay={{
                   delay: autoplayDelay,
                   disableOnInteraction: false,
                 }}
-                effect={"coverflow"}
+                effect="coverflow"
                 grabCursor={true}
                 centeredSlides={true}
                 loop={true}
                 slidesPerView={"auto"}
                 coverflowEffect={{
                   rotate: 0,
-                  stretch: 0,
+                  stretch: 3, // 👈 adds visible gap
                   depth: 100,
                   modifier: 2.5,
+                  slideShadows: false,
                 }}
                 pagination={showPagination}
                 navigation={
