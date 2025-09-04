@@ -6,6 +6,7 @@ import Hero from './components/Hero'
 import { ThemeProvider } from 'next-themes'
 import Featured from './components/Featured'
 import PopularCategories from './components/PopularCategories'
+import Instructors from './components/Instructors'
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
           <Hero/>
           <Featured/>
           <PopularCategories/>
+          <Instructors/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>

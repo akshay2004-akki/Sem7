@@ -85,12 +85,12 @@ const CategoryCard = ({ icon, name }) => {
 function PopularCategories() {
   return (
     <div className="w-full">
-      <section className="relative w-full min-h-screen bg-black text-white flex items-center justify-center py-20 px-4 overflow-hidden">
+      <section className="relative w-full h-[108vh] bg-black text-white flex items-center justify-center py-20 px-4 overflow-hidden">
         
         {/* Updated Background Gradient Blobs */}
-        <div className="absolute top-[-10rem] left-[-10rem] w-96 h-96 bg-cyan-500/40 rounded-full filter blur-3xl opacity-50"></div>
-        <div className="absolute top-[-10rem] right-[-10rem] w-96 h-96 bg-purple-600/40 rounded-full filter blur-3xl opacity-50"></div>
-        <div className="absolute bottom-[-5rem] left-1/4 w-96 h-96 bg-pink-500/40 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute top-[-10rem] left-[-10rem] w-64 h-64 sm:w-96 sm:h-96 bg-cyan-500/40 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute top-[-10rem] right-[-10rem] w-64 h-64 sm:w-96 sm:h-96 bg-purple-600/40 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute bottom-[-5rem] left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/40 rounded-full filter blur-3xl opacity-50"></div>
 
         <div className="relative z-10 w-full max-w-6xl mx-auto">
           <h2 className="text-center text-4xl sm:text-5xl font-bold mb-12">
