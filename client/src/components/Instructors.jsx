@@ -62,49 +62,72 @@ const InstructorCard = ({ instructor }) => {
   return (
     <div
       className="
-        bg-[#161B22] 
-        border border-gray-700/50 
-        rounded-2xl 
-        p-8 text-center 
-        flex flex-col items-center
-        transition-all duration-300 
-        ease-in-out
-        transform hover:-translate-y-2 hover:scale-105
-        hover:border-cyan-500/50
-        hover:shadow-xl hover:shadow-cyan-500/20
-      "
+    relative bg-transparent 
+    border-none
+    rounded-2xl w-auto
+    p-8 text-center 
+    flex flex-col items-center justify-center
+    transition-all duration-500 
+    ease-in-out
+    transform
+    overflow-hidden
+    group
+  "
     >
-      <img
-        src={instructor.imageUrl}
-        alt={`Profile of ${instructor.name}`}
-        className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-700 shadow-lg"
-      />
-      <h3 className="mt-6 text-xl font-bold text-white">
-        {instructor.name}
-      </h3>
-      <div className="flex items-center justify-center mt-2 gap-2">
-        <StarRating rating={instructor.rating} />
-        <span className="text-sm text-gray-400">
-          ({instructor.reviews})
-        </span>
-      </div>
-      <p className="mt-2 text-base text-cyan-400">
-        {instructor.expertise}
-      </p>
-      <a
-        href="#"
+      {/* Gradient border glow for the card */}
+      <span
         className="
-          mt-6 w-full
-          bg-cyan-600 text-white 
-          font-semibold py-3 px-6 
-          rounded-lg 
-          transition-colors duration-300 
-          hover:bg-cyan-500
-          focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75
-        "
+      absolute inset-0 rounded-2xl p-[2px]
+      bg-gradient-to-r from-cyan-400 via-pink-500 to-purple-500 
+      opacity-100 sm:opacity-100 md:opacity-0 md:group-hover:opacity-100
+      transition-opacity duration-500
+    "
       >
-        View Courses
-      </a>
+        <span className="block w-full h-full bg-black rounded-2xl"></span>
+      </span>
+
+      {/* Card content */}
+      <div className="relative  z-10 flex flex-col items-center">
+        <img
+          src={instructor.imageUrl}
+          alt={`Profile of ${instructor.name}`}
+          className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-700 shadow-lg"
+        />
+        <h3 className="mt-6 text-xl font-bold text-white">{instructor.name}</h3>
+        <div className="flex items-center justify-center mt-2 gap-2">
+          <StarRating rating={instructor.rating} />
+          <span className="text-sm text-gray-400">({instructor.reviews})</span>
+        </div>
+        <p className="mt-2 text-base text-cyan-400">{instructor.expertise}</p>
+
+        {/* Gradient button inside */}
+        <a
+          href="#"
+          className="
+        relative mt-6 w-full
+        text-white 
+        font-semibold py-3 px-6 
+        rounded-lg 
+        transition-all duration-500
+        overflow-hidden
+        group/button
+      "
+        >
+          {/* Gradient border glow for button */}
+          <span
+            className="
+          absolute inset-0 rounded-lg p-[2px]
+          bg-gradient-to-r from-yellow-400 via-pink-500 to-red-500
+          opacity-100 sm:opacity-100 md:opacity-0 md:group-hover/button:opacity-100
+          transition-opacity duration-500
+        "
+          >
+            <span className="block w-full h-full bg-black rounded-lg"></span>
+          </span>
+
+          <span className="relative z-10">View Courses</span>
+        </a>
+      </div>
     </div>
   );
 };
@@ -118,10 +141,11 @@ const Instructors = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Meet the Experts
+            Meet the <span className="text-[#00ffff]">Experts</span>
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
-            Learn from the best and most experienced instructors in the industry.
+            Learn from the best and most experienced instructors in the
+            industry.
           </p>
         </div>
 
