@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes'
 import Featured from './components/Featured'
 import PopularCategories from './components/PopularCategories'
 import Instructors from './components/Instructors'
+import ReviewsSection from './components/ReviewSection'
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Featured/>
           <PopularCategories/>
           <Instructors/>
+          <ReviewsSection/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>
