@@ -9,6 +9,7 @@ import PopularCategories from './components/PopularCategories'
 import Instructors from './components/Instructors'
 import ReviewsSection from './components/ReviewSection'
 import Connect from './components/Connect'
+import TrendingTech from './components/TrendingTech'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
           <Instructors/>
           <ReviewsSection/>
           <Connect/>
+          <TrendingTech/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>

@@ -66,7 +66,7 @@ export default function Connect() {
       <div
         className="pointer-events-none absolute -inset-20 opacity-40 blur-3xl transition duration-300"
         style={{
-          background: `radial-gradient(400px at ${mousePosition.x}px ${mousePosition.y}px, rgba(0,191,255,0.35), transparent 80%)`,
+          background: `radial-gradient(400px at ${mousePosition.x}px ${mousePosition.y}px, rgba(0,191,255,0.35), transparent 40%)`,
         }}
       ></div>
 
@@ -138,7 +138,7 @@ export default function Connect() {
               technology, arts, health, or entrepreneurship—our platform gives
               you the power to learn, create, and grow without boundaries.
             </p>
-            <button className="mt-8 bg-[#00bfff] text-black font-semibold py-3 px-8 rounded-lg hover:bg-[#00a6e0] transition-all shadow-lg shadow-cyan-500/50">
+            <button className="mt-8 bg-[#00ffff] text-black font-semibold py-3 px-8 rounded-lg hover:bg-black hover:border hover:text-white duration-200 transition-all shadow-lg shadow-cyan-500/50">
               Start Learning Today
             </button>
           </div>
