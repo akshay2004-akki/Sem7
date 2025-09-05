@@ -8,6 +8,7 @@ import Featured from './components/Featured'
 import PopularCategories from './components/PopularCategories'
 import Instructors from './components/Instructors'
 import ReviewsSection from './components/ReviewSection'
+import Connect from './components/Connect'
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <PopularCategories/>
           <Instructors/>
           <ReviewsSection/>
+          <Connect/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>
