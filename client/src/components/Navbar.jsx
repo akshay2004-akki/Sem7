@@ -60,14 +60,14 @@ useEffect(() => {
   ];
 
   return (
-    <header className="h-14 flex items-center backdrop-blur-[3px] justify-between px-3 dark:border-gray-700 fixed w-full z-50">
+    <header className="h-14 flex shadow-[0_0.5px_10px_0_#00ffff] items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
       {/* --- Left: Logo + Hamburger --- */}
       <div className="flex items-center gap-3">
         <button
           className="lg:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
           onClick={() => setSidebarOpen(true)}
         >
-          <Menu className="h-6 w-6 text-gray-700 dark:text-gray-200" />
+          <Menu className="h-6 w-6 text-white dark:text-gray-200" />
         </button>
         <img src={logo} alt="Logo" className="h-12 rounded" />
       </div>

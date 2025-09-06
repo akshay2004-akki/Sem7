@@ -58,7 +58,7 @@ export default function Connect() {
 
   return (
     <section
-      className="w-full bg-black text-white flex items-center px-3 md:p-0 justify-center py-20 relative overflow-hidden"
+      className="w-full bg-black h-[100vh] text-white flex items-center px-3 md:p-0 justify-center py-20 relative overflow-hidden"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

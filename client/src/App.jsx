@@ -10,6 +10,9 @@ import Instructors from './components/Instructors'
 import ReviewsSection from './components/ReviewSection'
 import Connect from './components/Connect'
 import TrendingTech from './components/TrendingTech'
+import Community from './components/Community'
+import JoinUs from './components/JoinUs'
+import Footer from './components/Footer'
 
 function App() {
 
@@ -30,9 +33,12 @@ function App() {
           <ReviewsSection/>
           <Connect/>
           <TrendingTech/>
+          <Community/>
+          <JoinUs/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>
+        <Footer/>
        </Router>
     </>
   )
