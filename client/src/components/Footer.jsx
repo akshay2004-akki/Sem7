@@ -12,7 +12,7 @@ function Footer() {
       <div className="relative max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Logo + tagline */}
         <div>
-          <h2 className="text-xl font-bold text-white">EduLamp</h2>
+          <h2 className="text-xl font-bold text-white">Neuronest</h2>
           <p className="mt-3 text-sm text-gray-400">
             Learn. Build. Shine brighter every day.
           </p>
