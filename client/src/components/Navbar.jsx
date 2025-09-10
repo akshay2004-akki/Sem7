@@ -3,35 +3,47 @@
 import { useState, useRef, useEffect } from "react";
 import logo from "../assets/Flat Vector Logo with Vibrant Greens (1).png";
 import { ExpandedTabs } from "./ui/expanded-tabs.jsx";
-import { Bell, HelpCircle, Home, Lock, Menu, Settings, Shield, User, X } from "lucide-react";
+import {
+  Bell,
+  HelpCircle,
+  Home,
+  Lock,
+  Menu,
+  Settings,
+  User,
+  X,
+  Book,
+  LayoutDashboard,
+  Search,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const profileRef = useRef(null);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
+  const profileRef = useRef(null);
   const sidebarRef = useRef(null);
 
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-      setSidebarOpen(false);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setSidebarOpen(false);
+      }
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-  };
 
-  if (isSidebarOpen) {
-    document.addEventListener("mousedown", handleClickOutside);
-  } else {
-    document.removeEventListener("mousedown", handleClickOutside);
-  }
-
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, [isSidebarOpen]);
-
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSidebarOpen]);
 
   // --- Handlers for login/logout state ---
   const handleLogin = () => setIsLoggedIn(true);
@@ -52,11 +64,11 @@ useEffect(() => {
   }, []);
 
   const tabs = [
-    { title: "Dashboard", icon: Home, link: "dashboard" },
+    { title: "Home", icon: Home, link: "" },
+    { title: "Dashboard", icon: LayoutDashboard, link: "dashboard" },
+    { title: "Courses", icon: Book, link: "courses" },
     { title: "Notifications", icon: Bell, link: "notifications" },
-    { title: "Settings", icon: Settings, link: "settings" },
     { title: "Support", icon: HelpCircle, link: "support" },
-    { title: "Security", icon: Shield, link: "security" },
   ];
 
   return (
@@ -72,13 +84,30 @@ useEffect(() => {
         <img src={logo} alt="Logo" className="h-12 rounded" />
       </div>
 
-      {/* --- Center: Tabs for Large Screens --- */}
-      <div className="hidden lg:flex items-center justify-center">
+      {/* --- Center: Tabs + Search (Large Screens) --- */}
+      <div className="hidden lg:flex items-center justify-center gap-6">
         <ExpandedTabs tabs={tabs} />
+        {/* Search bar for large screens */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="px-4 py-2 rounded-lg bg-white/90 text-gray-700 focus:outline-none w-64 shadow-md"
+          />
+          <Search className="absolute right-3 top-2.5 text-gray-500 h-5 w-5" />
+        </div>
       </div>
 
-      {/* --- Right side with Profile / Login --- */}
+      {/* --- Right side with Search (mobile) + Profile / Login --- */}
       <div ref={profileRef} className="relative flex items-center gap-3">
+        {/* Mobile search toggle */}
+        <button
+          onClick={() => setShowMobileSearch(!showMobileSearch)}
+          className="lg:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <Search className="h-6 w-6 text-white dark:text-gray-200" />
+        </button>
+
         {/* Profile button */}
         <button
           onClick={() => setProfileOpen(!isProfileOpen)}
@@ -133,6 +162,28 @@ useEffect(() => {
         </button>
       </div>
 
+      {/* --- Mobile Search Bar (expands below navbar) --- */}
+      <AnimatePresence>
+        {showMobileSearch && (
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 p-3 z-40 shadow-md lg:hidden"
+          >
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none"
+              />
+              <Search className="absolute right-3 top-2.5 text-gray-500 h-5 w-5" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* --- Sidebar for Mobile --- */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -148,13 +199,12 @@ useEffect(() => {
 
             {/* Sidebar */}
             <motion.aside
-            ref={sidebarRef}
+              ref={sidebarRef}
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="fixed top-[40px] left-[40px] w-auto h-auto bg-black shadow-lg z-50 p-5 flex flex-col"
-
             >
               <div className="flex justify-between items-center mb-6">
                 <button onClick={() => setSidebarOpen(false)}>

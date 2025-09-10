@@ -5,9 +5,6 @@ function Footer() {
   return (
     <footer className="relative w-full bg-black text-gray-300 pt-20 pb-12 px-6 overflow-hidden">
       {/* Glow from previous section */}
-      <div className="absolute top-[-30px] left-1/2 -translate-x-1/2 w-[800px] h-[150px] 
-                      bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.25)_0%,transparent_70%)] 
-                      blur-[60px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Logo + tagline */}

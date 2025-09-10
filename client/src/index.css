@@ -4,6 +4,9 @@
 @import "tailwindcss";
 
 /* Add this to your global CSS file */
+body{
+  background-color: black;
+}
 .bg-radial-gradient-spotlight {
   background: radial-gradient(
     250px circle at var(--mouse-x) var(--mouse-y),

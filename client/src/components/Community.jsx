@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Community() {
   return (
-    <section className="relative w-full h-[100vh] bg-black text-white flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-16 overflow-hidden">
+    <section className="relative w-full h-[100vh] bg-black text-white flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-16">
       {/* Left Content */}
       <div className="flex-1 text-center md:text-left z-10">
         <h2 className="text-3xl md:text-5xl font-bold mb-8">
