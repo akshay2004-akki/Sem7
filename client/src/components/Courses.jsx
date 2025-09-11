@@ -1,5 +1,6 @@
 import React from "react";
 import SplitText from "./SplitText";
+import FadeContent from "./FadeContent";
 
 function Courses() {
   const handleAnimationComplete = () => {
@@ -8,7 +9,7 @@ function Courses() {
   const handleNavigate = (courseId) => {
     // Logic to navigate to course detail page
     console.log(`Navigate to course with ID: ${courseId}`);
-  }
+  };
 
   // Example courses array
   const courses = [
@@ -56,7 +57,7 @@ function Courses() {
         <div className="mx-auto p-5 w-full relative sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex flex-col mt-16 items-center justify-center">
             {/* Heading */}
-            <div>
+            <div className="flex flex-col items-center">
               <SplitText
                 text="Discover Courses That Empower You"
                 className="text-3xl text-white font-semibold text-center"
@@ -71,50 +72,62 @@ function Courses() {
                 textAlign="center"
                 onLetterAnimationComplete={handleAnimationComplete}
               />
+
+              {/* Underlines */}
+              <span className="relative mt-3">
+                <span className="block h-[2px] w-16 bg-cyan-400 mx-auto relative before:content-[''] before:absolute before:-bottom-2 before:left-1/2 before:-translate-x-1/2 before:h-[2px] before:w-8 before:bg-cyan-300"></span>
+              </span>
             </div>
 
             {/* Course Cards */}
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
               {courses.map((course) => (
-                <div
-                  key={course.id}
-                  className="bg-[#060010] text-white rounded-2xl shadow-lg overflow-hidden transition duration-300"
+                <FadeContent
+                  blur={true}
+                  duration={1000}
+                  easing="ease-out"
+                  initialOpacity={0}
                 >
-                  {/* Thumbnail */}
-                  <div className="h-44 w-full overflow-hidden">
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="h-full w-full object-cover hover:scale-105 transition duration-500"
-                    />
-                  </div>
+                  <div
+                    key={course.id}
+                    className="bg-[#060010] text-white rounded-2xl shadow-lg overflow-hidden transition duration-300"
+                  >
+                    {/* Thumbnail */}
+                    <div className="h-44 w-full overflow-hidden">
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="h-full w-full object-cover hover:scale-105 transition duration-500"
+                      />
+                    </div>
 
-                  {/* Content */}
-                  <div className="p-5 flex flex-col gap-4 h-full">
-                    {/* Title as button */}
-                    <button
-                      onClick={() => handleNavigate(course.id)}
-                      className="text-lg font-bold text-left text-white hover:text-cyan-400 transition-colors duration-300 line-clamp-2"
-                    >
-                      {course.title}
-                    </button>
+                    {/* Content */}
+                    <div className="p-5 flex flex-col gap-4 h-full">
+                      {/* Title as button */}
+                      <button
+                        onClick={() => handleNavigate(course.id)}
+                        className="text-lg font-bold text-left text-white hover:text-cyan-400 transition-colors duration-300 line-clamp-2"
+                      >
+                        {course.title}
+                      </button>
 
-                    {/* Description */}
-                    <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
-                      {course.description}
-                    </p>
+                      {/* Description */}
+                      <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
+                        {course.description}
+                      </p>
 
-                    {/* Footer row */}
-                    <div className="flex items-center justify-between mt-auto pt-3">
-                      <span className="text-xs sm:text-sm px-3 py-1 bg-[#1c1c1c] text-cyan-400 rounded-full">
-                        {course.category}
-                      </span>
-                      <span className="font-semibold text-cyan-300 text-sm sm:text-base">
-                        {course.currency} {course.price}
-                      </span>
+                      {/* Footer row */}
+                      <div className="flex items-center justify-between mt-auto pt-3">
+                        <span className="text-xs sm:text-sm px-3 py-1 bg-[#1c1c1c] text-cyan-400 rounded-full">
+                          {course.category}
+                        </span>
+                        <span className="font-semibold text-cyan-300 text-sm sm:text-base">
+                          {course.currency} {course.price}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </FadeContent>
               ))}
             </div>
           </div>
