@@ -1,5 +1,8 @@
 import './App.css'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import { useEffect } from "react";
+import Lenis from "@studio-freight/lenis";
+
 import Navbar from './components/Navbar'
 import Dashboard from './components/Dashboard'
 import Hero from './components/Hero'
@@ -13,9 +16,27 @@ import TrendingTech from './components/TrendingTech'
 import Community from './components/Community'
 import JoinUs from './components/JoinUs'
 import Footer from './components/Footer'
+import Courses from './components/Courses'
+
 
 function App() {
+   useEffect(() => {
+    const lenis = new Lenis({
+      duration: 2, // scroll smoothing factor
+      smooth: true,
+    });
 
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   return (
     <>
@@ -37,6 +58,7 @@ function App() {
           <JoinUs/>
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
+          <Route path='/courses' element={<Courses/>}/>
         </Routes>
         <Footer/>
        </Router>

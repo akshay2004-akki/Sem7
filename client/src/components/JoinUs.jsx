@@ -48,9 +48,9 @@ function JoinUs() {
           Join thousands of learners today and start building skills that matter.
         </p>
         <button
-          className="px-8 py-4 rounded-md bg-white text-black font-semibold text-base md:text-lg 
+          className="px-8 py-4 rounded-md bg-[#00ffff] text-black font-semibold text-base md:text-lg 
                      hover:shadow-[0_0_40px_rgba(255,255,255,0.8)] 
-                     hover:bg-gray-200 transition duration-300"
+                     hover:bg-black hover:border hover:text-white transition duration-300"
           style={{
             boxShadow:
               "0 14px 24px rgba(0,0,0,0.65), 0 0 25px rgba(255,255,255,0.6)",

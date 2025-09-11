@@ -1,5 +1,7 @@
 import React from "react";
 import { CardCarousel } from "@/components/ui/card-carousel";
+import ScrollReveal from "./ScrollReveal";
+
 // Example course data
 const courses = [
   {
@@ -33,7 +35,13 @@ function Featured() {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <linearGradient id="blobGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient
+              id="blobGradient2"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop offset="0%" stopColor="#ff00ff" stopOpacity="0.8" />
               <stop offset="100%" stopColor="#00ffff" stopOpacity="0.6" />
             </linearGradient>
@@ -49,13 +57,20 @@ function Featured() {
 
       {/* Hero content */}
       <div className="relative z-10 text-center mt-10">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-          Featured <span className="text-[#00ffff]">Courses</span>
-        </h1>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed">
-  Discover top-rated courses with expert instructors and engaging lessons.
-</p>
-
+        <ScrollReveal
+          baseOpacity={0}
+          enableBlur={true}
+          baseRotation={20}
+          blurStrength={20}
+        >
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+            Featured <span className="text-[#00ffff]">Courses</span>
+          </h1>
+          <p className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed">
+            Discover top-rated courses with expert instructors and engaging
+            lessons.
+          </p>
+        </ScrollReveal>
 
         <div className="mt-5 w-full">
           <CardCarousel

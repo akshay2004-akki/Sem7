@@ -1,4 +1,5 @@
 import React from "react";
+import CountUp from './CountUp'
 
 export default function Community() {
   return (
@@ -6,31 +7,55 @@ export default function Community() {
       {/* Left Content */}
       <div className="flex-1 text-center md:text-left z-10">
         <h2 className="text-3xl md:text-5xl font-bold mb-8">
-          Global Community <br /> <span className="text-cyan-400">Learner Network</span>
+          Global Community <br />{" "}
+          <span className="text-cyan-400">Learner Network</span>
         </h2>
 
         <p className="text-gray-300 text-left mb-6 max-w-lg mx-auto md:mx-0 text-xl md:text-lg ">
-            Join a thriving global network of learners and mentors, with members from 195+ countries, actively collaborating, sharing knowledge, and growing together.
+          Join a thriving global network of learners and mentors, with members
+          from 195+ countries, actively collaborating, sharing knowledge, and
+          growing together.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-lg mx-auto md:mx-0 mb-8">
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center shadow-md">
             <p className="text-gray-300 text-lg">Members</p>
-            <h3 className="text-2xl font-bold text-white">1,234,567</h3>
+            <h3 className="text-2xl font-bold text-white">
+              <CountUp
+                from={0}
+                to={1234567}
+                separator=","
+                direction="up"
+                duration={0.5}
+                className="count-up-text"
+              />
+            </h3>
           </div>
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center shadow-md">
             <p className="text-gray-300 text-lg">Active Learners</p>
-            <h3 className="text-2xl font-bold text-white">456,789</h3>
+            <h3 className="text-2xl font-bold text-white">
+              <CountUp
+                from={0}
+                to={456789}
+                separator=","
+                direction="up"
+                duration={0.5}
+                className="count-up-text"
+              />
+            </h3>
           </div>
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center shadow-md">
             <p className="text-gray-300 text-lg">Countries</p>
-            <h3 className="text-2xl font-bold text-white">195</h3>
+            <h3 className="text-2xl font-bold text-white"><CountUp
+                from={0}
+                to={195}
+                separator=","
+                direction="up"
+                duration={0.5}
+                className="count-up-text"
+              /></h3>
           </div>
         </div>
-
-        <button className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-full font-semibold shadow-lg hover:scale-105 transition-transform duration-300">
-          Become a Member
-        </button>
       </div>
 
       {/* Right Content - Globe */}

@@ -18,7 +18,7 @@ const SplitText = ({
   threshold = 0.1,
   rootMargin = '-100px',
   textAlign = 'center',
-  tag = 'p',
+  tag = 'h1',
   onLetterAnimationComplete
 }) => {
   const ref = useRef(null);

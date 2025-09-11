@@ -1,5 +1,6 @@
 import React from "react";
 import { Star } from "lucide-react";
+import ScrollReveal from "./ScrollReveal";
 
 const instructorsData = [
   {
@@ -140,13 +141,20 @@ const Instructors = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Meet the <span className="text-[#00ffff]">Experts</span>
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
-            Learn from the best and most experienced instructors in the
-            industry.
-          </p>
+          <ScrollReveal
+            baseOpacity={0}
+            enableBlur={true}
+            baseRotation={20}
+            blurStrength={20}
+          >
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              Meet the <span className="text-[#00ffff]">Experts</span>
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
+              Learn from the best and most experienced instructors in the
+              industry.
+            </p>
+          </ScrollReveal>
         </div>
 
         {/* Responsive Grid for Instructors */}
