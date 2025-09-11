@@ -90,7 +90,7 @@ function Courses() {
                 >
                   <div
                     key={course.id}
-                    className="bg-[#060010] text-white rounded-2xl shadow-lg overflow-hidden transition duration-300"
+                    className="bg-transparent hover:bg-[#060010] text-white rounded-2xl shadow-lg overflow-hidden transition duration-300"
                   >
                     {/* Thumbnail */}
                     <div className="h-44 w-full overflow-hidden">
