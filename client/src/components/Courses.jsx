@@ -13,7 +13,7 @@ function Courses() {
   };
 
   // Example courses array
-  const courses = [
+ const courses = [
   {
     id: 1,
     title: "Web Development Bootcamp",
@@ -39,15 +39,6 @@ function Courses() {
     category: "AI/ML",
     thumbnail: "/assets/herologo.png",
     price: 999,
-    currency: "INR",
-  },
-  {
-    id: 4,
-    title: "UI/UX Design Masterclass",
-    description: "Learn to design stunning user interfaces and experiences.",
-    category: "Design",
-    thumbnail: "/assets/logo.png",
-    price: 599,
     currency: "INR",
   },
   {
@@ -87,57 +78,12 @@ function Courses() {
     currency: "INR",
   },
   {
-    id: 9,
-    title: "Database Management with MongoDB",
-    description: "Learn MongoDB for modern NoSQL applications.",
-    category: "Database",
-    thumbnail: "/assets/herologo.png",
-    price: 699,
-    currency: "INR",
-  },
-  {
     id: 10,
     title: "Full Stack Development",
     description: "Become a MERN stack developer with hands-on projects.",
     category: "Development",
     thumbnail: "/assets/logo.png",
     price: 1299,
-    currency: "INR",
-  },
-  {
-    id: 11,
-    title: "Cybersecurity Fundamentals",
-    description: "Understand ethical hacking, security tools, and defense.",
-    category: "Security",
-    thumbnail: "/assets/student.png",
-    price: 899,
-    currency: "INR",
-  },
-  {
-    id: 12,
-    title: "Cloud Computing with AWS",
-    description: "Learn AWS services and deploy scalable applications.",
-    category: "Cloud",
-    thumbnail: "/assets/herologo.png",
-    price: 1099,
-    currency: "INR",
-  },
-  {
-    id: 13,
-    title: "Android Development",
-    description: "Build native Android apps using Java and Kotlin.",
-    category: "Mobile Development",
-    thumbnail: "/assets/logo.png",
-    price: 899,
-    currency: "INR",
-  },
-  {
-    id: 14,
-    title: "iOS Development with Swift",
-    description: "Learn to create iOS apps using Swift and Xcode.",
-    category: "Mobile Development",
-    thumbnail: "/assets/student.png",
-    price: 999,
     currency: "INR",
   },
   {
@@ -158,43 +104,8 @@ function Courses() {
     price: 1299,
     currency: "INR",
   },
-  {
-    id: 17,
-    title: "Data Science with Python",
-    description: "Learn data analysis, visualization, and pandas.",
-    category: "Data Science",
-    thumbnail: "/assets/student.png",
-    price: 999,
-    currency: "INR",
-  },
-  {
-    id: 18,
-    title: "Big Data Analytics",
-    description: "Analyze large datasets using Hadoop and Spark.",
-    category: "Data Science",
-    thumbnail: "/assets/herologo.png",
-    price: 1399,
-    currency: "INR",
-  },
-  {
-    id: 19,
-    title: "DevOps Essentials",
-    description: "Master CI/CD, Docker, Kubernetes, and monitoring tools.",
-    category: "DevOps",
-    thumbnail: "/assets/logo.png",
-    price: 1199,
-    currency: "INR",
-  },
-  {
-    id: 20,
-    title: "Blockchain & Web3",
-    description: "Understand blockchain fundamentals and smart contracts.",
-    category: "Blockchain",
-    thumbnail: "/assets/student.png",
-    price: 1499,
-    currency: "INR",
-  },
 ];
+
 
   // Group courses by category
   const coursesByCategory = courses.reduce((acc, course) => {

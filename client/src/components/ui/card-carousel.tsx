@@ -1,10 +1,12 @@
 import React from "react";
+// import Image from "next/image"
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
+import { SparklesIcon } from "lucide-react";
 import {
   Autoplay,
   EffectCoverflow,
@@ -12,134 +14,168 @@ import {
   Pagination,
 } from "swiper/modules";
 
+import { Badge } from "@/components/ui/badge";
+
 interface CarouselProps {
   courses: {
-    id: string | number;
+    id: string;
     title: string;
     description: string;
     thumbnail: string;
-    price?: number;
-    currency?: string;
   }[];
   autoplayDelay?: number;
   showPagination?: boolean;
   showNavigation?: boolean;
-  onNavigate?: (id: string | number) => void;
-  carouselId: string; // unique ID per carousel
+  onNavigate?: (courseId) => {};
 }
 
 export const CardCarousel: React.FC<CarouselProps> = ({
   courses,
-  autoplayDelay = 2000,
+  autoplayDelay = 1500,
   showPagination = true,
   showNavigation = true,
-  onNavigate,
-  carouselId,
+  onNavigate
 }) => {
+  const css = `
+  .swiper {
+    width: 100%;
+    padding-bottom: 50px;
+  }
+  
+  .swiper-slide {
+    background-position: center;
+    background-size: cover;
+    width: 300px;
+    /* height: 300px; */
+    /* margin: 20px; */
+  }
+  
+  .swiper-slide img {
+    display: block;
+    width: 100%;
+  }
+  
+  
+  .swiper-3d .swiper-slide-shadow-left {
+    background-image: none;
+  }
+  .swiper-3d .swiper-slide-shadow-right{
+    background: none;
+  }
+  `;
   return (
-    <section className="w-full py-6">
-      <div className="mx-auto w-full max-w-6xl rounded-[24px] p-4 shadow-md bg-neutral-900/50">
-        <div className="relative w-full flex flex-col items-center">
-          <Swiper
-            key={carouselId} // 👈 ensures independent re-init
-            id={`swiper-${carouselId}`} // 👈 unique DOM id
-            spaceBetween={20}
-            autoplay={{
-              delay: autoplayDelay,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true, // 👈 pause on hover, resume on leave
-            }}
-            effect="coverflow"
-            grabCursor={true}
-            centeredSlides={true}
-            loop={true} // 👈 keeps infinite loop
-            slidesPerView={3}
-            breakpoints={{
-              320: { slidesPerView: 1 },
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-            coverflowEffect={{
-              rotate: 0,
-              stretch: 5,
-              depth: 120,
-              modifier: 2,
-              slideShadows: false,
-            }}
-            pagination={
-              showPagination
-                ? { clickable: true, el: `.swiper-pagination-${carouselId}` }
-                : false
-            }
-            navigation={
-              showNavigation
-                ? {
-                    nextEl: `.swiper-button-next-${carouselId}`,
-                    prevEl: `.swiper-button-prev-${carouselId}`,
-                  }
-                : undefined
-            }
-            modules={[EffectCoverflow, Autoplay, Pagination, Navigation]}
-            className="w-full relative"
-          >
-            {courses.map((course) => (
-              <SwiperSlide key={course.id}>
-                <div
-                  onClick={() => onNavigate?.(course.id)}
-                  className="cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40"
-                >
-                  {/* Image */}
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-cyan-400 shadow-md mb-4">
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+    <section className="w-ace-y-4">
+      <style>{css}</style>
+      <div className="mx-auto w-full max-w-4xl rounded-[24px] border border-black/5 p-2 shadow-sm md:rounded-t-[44px]">
+        <div className="relative mx-auto flex w-full flex-col rounded-[24px] border-none bg-neutral-800/5 p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
+          <Badge
+            variant="outline"
+            className="absolute left-4 top-6 rounded-[14px] border border-black/10 text-base md:left-6"
+          ></Badge>
+          <div className="flex flex-col justify-center pb-2 pl-4 pt-14 md:items-center">
+            <div className="flex gap-2">
+              <div></div>
+            </div>
+          </div>
 
-                  {/* Title */}
-                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 line-clamp-2">
-                    {course.title}
-                  </h3>
+          <div className="flex w-full items-center justify-center gap-4">
+            <div className="w-full">
+              <Swiper
+                spaceBetween={100} // controls gap between cards
+                autoplay={{
+                  delay: autoplayDelay,
+                  disableOnInteraction: false,
+                }}
+                effect="coverflow"
+                grabCursor={true}
+                centeredSlides={true}
+                loop={true}
+                slidesPerView={"auto"}
+                coverflowEffect={{
+                  rotate: 0,
+                  stretch: 3, // 👈 adds visible gap
+                  depth: 100,
+                  modifier: 2.5,
+                  slideShadows: false,
+                }}
+                pagination={showPagination}
+                navigation={
+                  showNavigation
+                    ? {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev",
+                      }
+                    : undefined
+                }
+                modules={[EffectCoverflow, Autoplay, Pagination, Navigation]}
+              >
+                {courses.map((course, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-5 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40">
+                      {/* Image */}
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-cyan-400 shadow-md mb-4">
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                  {/* Description */}
-                  <p className="text-gray-300 text-sm sm:text-base line-clamp-3">
-                    {course.description}
-                  </p>
+                      {/* Title */}
+                      <button onClick={()=>onNavigate(course.id)} className="text-lg hover:text-cyan-400 sm:text-xl font-semibold text-white mb-2">
+                        {course.title}
+                      </button>
 
-                  {/* Price */}
-                  {course.price && (
-                    <span className="mt-3 text-cyan-300 font-semibold">
-                      {course.currency} {course.price}
-                    </span>
-                  )}
-                </div>
-              </SwiperSlide>
-            ))}
+                      {/* Description */}
+                      <p className="text-gray-300 text-sm sm:text-base line-clamp-3">
+                        {course.description}
+                      </p>
 
-            {/* Navigation buttons inside Swiper */}
-            {showNavigation && (
-              <>
-                <button
-                  className={`swiper-button-prev-${carouselId} absolute top-1/2 -translate-y-1/2 left-2 z-10 bg-black/40 hover:bg-cyan-500/70 text-white p-2 rounded-full shadow-md`}
-                >
-                  ⬅
-                </button>
-                <button
-                  className={`swiper-button-next-${carouselId} absolute top-1/2 -translate-y-1/2 right-2 z-10 bg-black/40 hover:bg-cyan-500/70 text-white p-2 rounded-full shadow-md`}
-                >
-                  ➡
-                </button>
-              </>
-            )}
-          </Swiper>
+                      {/* Fancy separator */}
+                      <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full my-3"></div>
 
-          {/* Pagination dots */}
-          {showPagination && (
-            <div
-              className={`swiper-pagination-${carouselId} mt-6 flex justify-center`}
-            />
-          )}
+                      {/* Instructor */}
+                      {/* <span className="text-cyan-300 text-sm font-medium">
+      👨‍🏫 {course.instructor}
+    </span> */}
+                    </div>
+                  </SwiperSlide>
+                ))}
+                {courses.map((course, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-5 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40">
+                      {/* Image */}
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-cyan-400 shadow-md mb-4">
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                        {course.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-gray-300 text-sm sm:text-base line-clamp-3">
+                        {course.description}
+                      </p>
+
+                      {/* Fancy separator */}
+                      <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full my-3"></div>
+
+                      {/* Instructor */}
+                      {/* <span className="text-cyan-300 text-sm font-medium">
+      👨‍🏫 {course.instructor}
+    </span> */}
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </div>
         </div>
       </div>
     </section>

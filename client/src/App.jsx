@@ -17,6 +17,7 @@ import Community from './components/Community'
 import JoinUs from './components/JoinUs'
 import Footer from './components/Footer'
 import Courses from './components/Courses'
+import Notifications from './components/Notifications';
 
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
           </>} />
           <Route path='/dashboard' element={<Dashboard/>}/>
           <Route path='/courses' element={<Courses/>}/>
+          <Route path='/notifications' element={<Notifications/>} />
         </Routes>
         <Footer/>
        </Router>

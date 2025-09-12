@@ -8,19 +8,19 @@ const courses = [
     id: 1,
     title: "Web Development Bootcamp",
     description: "Learn HTML, CSS, JavaScript, and React from scratch.",
-    image: "/assets/logo.png",
+    thumbnail: "/assets/logo.png",
   },
   {
     id: 2,
     title: "Data Structures & Algorithms",
     description: "Master problem-solving and coding interview preparation.",
-    image: "./assets/herologo.png",
+    thumbnail: "./assets/herologo.png",
   },
   {
     id: 3,
     title: "Machine Learning Essentials",
     description: "Build ML models and understand core AI concepts.",
-    image: "/assets/student.png",
+    thumbnail: "/assets/student.png",
   },
 ];
 
