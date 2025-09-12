@@ -90,7 +90,7 @@ export default function NotificationsSection() {
     <div className="min-h-screen bg-black sm:pb-16 lg:pb-20 xl:pb-24">
       <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
        
-        <div className="flex justify-between items-center mb-8 mt-8">
+        <div className="flex justify-between items-center mb-8 mt-10">
           <div className="flex items-center gap-3">
             <Bell className="text-cyan-400" size={32} />
             <h1 className="text-3xl font-bold text-cyan-400">Notifications</h1>
