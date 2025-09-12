@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, BookOpen, MessageSquare, Award, Clock, CheckCircle } from 'lucide-react';
 
-// --- Mock Data for Notifications ---
-// In a real application, this data would come from your backend API.
+
 const allNotifications = [
   {
     id: 1,

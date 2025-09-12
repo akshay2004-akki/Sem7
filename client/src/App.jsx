@@ -18,6 +18,7 @@ import JoinUs from './components/JoinUs'
 import Footer from './components/Footer'
 import Courses from './components/Courses'
 import Notifications from './components/Notifications';
+import UserProfile from './components/Profile';
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
           <Route path='/dashboard' element={<Dashboard/>}/>
           <Route path='/courses' element={<Courses/>}/>
           <Route path='/notifications' element={<Notifications/>} />
+          <Route path='/profile' element={<UserProfile/>}></Route>
         </Routes>
         <Footer/>
        </Router>
