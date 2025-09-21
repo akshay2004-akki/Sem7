@@ -19,6 +19,8 @@ import Footer from './components/Footer'
 import Courses from './components/Courses'
 import Notifications from './components/Notifications';
 import UserProfile from './components/Profile';
+import LoginSection from './components/Login';
+import SignUpSection from './components/SignUp';
 
 
 function App() {
@@ -63,6 +65,8 @@ function App() {
           <Route path='/courses' element={<Courses/>}/>
           <Route path='/notifications' element={<Notifications/>} />
           <Route path='/profile' element={<UserProfile/>}></Route>
+          <Route path='/login' element = {<LoginSection/>} ></Route>
+          <Route path='/signup' element = {<SignUpSection/>} ></Route>
         </Routes>
         <Footer/>
        </Router>
