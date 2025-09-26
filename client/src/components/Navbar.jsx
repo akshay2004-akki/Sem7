@@ -17,10 +17,10 @@ import {
   Search,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 👈 starts logged out
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -29,6 +29,7 @@ export default function Navbar() {
   const profileRef = useRef(null);
   const sidebarRef = useRef(null);
 
+  // Sidebar close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -49,8 +50,7 @@ export default function Navbar() {
 
   // --- Handlers for login/logout state ---
   const handleLogin = () => {
-    setIsLoggedIn(true)
-    navigate('/login');
+    navigate("/login");
   };
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -77,7 +77,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="h-14 flex  items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
+    <header className="h-14 flex items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
       {/* --- Left: Logo + Hamburger --- */}
       <div className="flex items-center gap-3">
         <button
@@ -113,58 +113,60 @@ export default function Navbar() {
           <Search className="h-6 w-6 text-white dark:text-gray-200" />
         </button>
 
-        {/* Profile button */}
-        <button
-          onClick={() => setProfileOpen(!isProfileOpen)}
-          className={`bg-amber-300 rounded-full transition-opacity ${
-            isLoggedIn ? "block" : "hidden"
-          }`}
-        >
-          <User className="rounded-full h-[45px] w-[45px] p-2 text-gray-700" />
-        </button>
+        {isLoggedIn ? (
+          <>
+            {/* Profile button */}
+            <button
+              onClick={() => setProfileOpen(!isProfileOpen)}
+              className="bg-amber-300 rounded-full"
+            >
+              <User className="rounded-full h-[45px] w-[45px] p-2 text-gray-700" />
+            </button>
 
-        {/* Dropdown */}
-        {isProfileOpen && isLoggedIn && (
-          <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 animate-in fade-in zoom-in-95">
-            <ul className="py-1">
-              <li>
-                <a
-                  href="/profile"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <User size={16} /> My Profile
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/settings"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <Settings size={16} /> Settings
-                </a>
-              </li>
-              <li className="border-t border-gray-200 dark:border-gray-600 my-1"></li>
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <Lock size={16} /> Log Out
-                </button>
-              </li>
-            </ul>
-          </div>
+            {/* Dropdown */}
+            {isProfileOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 animate-in fade-in zoom-in-95">
+                <ul className="py-1">
+                  <li>
+                    <a
+                      href="/profile"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <User size={16} /> My Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/settings"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Settings size={16} /> Settings
+                    </a>
+                  </li>
+                  <li className="border-t border-gray-200 dark:border-gray-600 my-1"></li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Lock size={16} /> Log Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Log in Button */}
+            <button
+              onClick={handleLogin}
+              className="bg-amber-300 p-2 px-4 rounded-xl text-gray-700 font-medium hover:bg-amber-400 transition-all"
+            >
+              Log in
+            </button>
+          </>
         )}
-
-        {/* Log in Button */}
-        <button
-          onClick={handleLogin}
-          className={`bg-amber-300 p-2 px-4 rounded-xl transition-opacity ${
-            !isLoggedIn ? "block" : "hidden"
-          }`}
-        >
-          Log in
-        </button>
       </div>
 
       {/* --- Mobile Search Bar (expands below navbar) --- */}

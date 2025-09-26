@@ -37,8 +37,8 @@ export default function SignUpSection() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-300 flex items-center justify-center font-sans p-4">
-      <div className="relative group w-full max-w-6xl transition-transform duration-300 hover:scale-[1.02]">
+    <div className="min-h-screen bg-black text-gray-300 flex items-center justify-center font-sans p-4 translate-y-[6vh]">
+      <div className="relative group w-full max-w-6xl transition-transform duration-300">
         {/* Gradient border that appears on hover */}
         <div 
           className="absolute -inset-px bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"

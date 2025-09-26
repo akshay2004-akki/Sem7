@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // A simple SVG for Google's icon
 const GoogleIcon = () => (
@@ -30,6 +31,7 @@ export default function LoginSection() {
     alert(`Welcome back! (Simulated login for ${email})`);
   };
 
+
   const handleGoogleLogin = () => {
     // In a real application, you would use a library like Firebase Auth
     // or Google Identity Services to handle the OAuth flow.
@@ -38,8 +40,8 @@ export default function LoginSection() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-300 flex items-center justify-center font-sans p-4">
-      <div className="relative group w-full max-w-6xl transition-transform duration-300 hover:scale-[1.02]">
+    <div className="min-h-screen bg-black text-gray-300 flex items-center justify-center font-sans p-4 translate-y-[4vh]">
+      <div className="relative group w-full max-w-6xl  transition-transform duration-300">
         {/* Gradient border that appears on hover */}
         <div 
           className="absolute -inset-px bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -130,7 +132,7 @@ export default function LoginSection() {
 
             {/* Sign Up Link */}
             <p className="text-center text-sm mt-8">
-              Don't have an account? <a href="/signup" className="font-semibold text-cyan-400 hover:underline">Sign Up</a>
+              Don't have an account? <Link to="/signup" className="font-semibold text-cyan-400 hover:underline">Sign Up</Link>
             </p>
           </div>
         </div>
