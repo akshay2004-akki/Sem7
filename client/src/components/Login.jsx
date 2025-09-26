@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 // A simple SVG for Google's icon
 const GoogleIcon = () => (
@@ -18,7 +19,7 @@ export default function LoginSection() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // --- Login Logic ---
     // Here, you would typically validate the inputs and send them to your
@@ -27,8 +28,14 @@ export default function LoginSection() {
       alert("Please enter both email and password.");
       return;
     }
-    console.log("Logging in with:", { email, password });
-    alert(`Welcome back! (Simulated login for ${email})`);
+    try {
+      const res = await axios.post('http://localhost:8000/api/v1/users/login', {email, password}, {withCredentials: true});
+      console.log(res);
+      
+    } catch (error) {
+      console.log(error.message);
+      
+    }
   };
 
 
