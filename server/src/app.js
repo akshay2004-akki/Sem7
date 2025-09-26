@@ -31,7 +31,7 @@ import progressRoutes from './routes/progress.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 
 app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/instructor', instructorRoutes);
+app.use('/api/v1/instructor', instructorRoutes); 
 app.use('/api/v1/courses',courseRoutes)
 app.use('/api/v1/sections', sectionRoutes);
 app.use('/api/v1/lectures', lectureRoutes);

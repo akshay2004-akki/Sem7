@@ -61,13 +61,13 @@ function PopularCategories() {
           <ScrollReveal
             baseOpacity={0}
             enableBlur={true}
-            baseRotation={0}
-            blurStrength={5}
+            baseRotation={20}
+            blurStrength={20}
           >
             <h2 className="text-center text-4xl sm:text-5xl font-bold mb-12">
               Popular <span className="text-cyan-400">Categories</span>
             </h2>
-
+          </ScrollReveal>
           <MagicBento
             cards={categories} // 👈 pass categories
             textAutoHide={true}
@@ -81,7 +81,6 @@ function PopularCategories() {
             clickEffect={true}
             glowColor="132,0,255"
             />
-            </ScrollReveal>
         </div>
       </section>
     </div>
