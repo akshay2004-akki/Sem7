@@ -21,9 +21,6 @@ export default function LoginSection() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // --- Login Logic ---
-    // Here, you would typically validate the inputs and send them to your
-    // backend API for authentication.
     if (!email || !password) {
       alert("Please enter both email and password.");
       return;
@@ -32,23 +29,35 @@ export default function LoginSection() {
       const res = await axios.post('http://localhost:8000/api/v1/users/login', {email, password}, {withCredentials: true});
       console.log(res);
       
+      if (res.status===200) {
+        // --- KEY CHANGE: Save login state to local storage ---
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Save user avatar if it exists in the API response
+        if (res.data.user && res.data.user.avatar) {
+          localStorage.setItem('userAvatar', res.data.user.avatar);
+        }
+
+        alert('Login successful!');
+        // Redirect to the home page after successful login
+        window.location.href = '/'; 
+      } else {
+        alert(res.data.message || 'Invalid credentials. Please try again.');
+      }
     } catch (error) {
       console.log(error.message);
-      
+      alert('An error occurred during login. Please try again.');
     }
   };
 
 
   const handleGoogleLogin = () => {
-    // In a real application, you would use a library like Firebase Auth
-    // or Google Identity Services to handle the OAuth flow.
-    // This is a simple simulation that opens the Google login page.
     window.open('https://accounts.google.com', '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className="min-h-screen bg-black text-gray-300 flex items-center justify-center font-sans p-4 translate-y-[4vh]">
-      <div className="relative group w-full max-w-6xl  transition-transform duration-300">
+      <div className="relative group w-full max-w-6xl transition-transform duration-300">
         {/* Gradient border that appears on hover */}
         <div 
           className="absolute -inset-px bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"

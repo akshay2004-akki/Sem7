@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 👈 starts logged out
@@ -52,9 +53,16 @@ export default function Navbar() {
   const handleLogin = () => {
     navigate("/login");
   };
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsLoggedIn(false);
     setProfileOpen(false);
+    const res = await axios.post('http://localhost:8000/api/v1/users/logout',{}, {withCredentials:true})
+    console.log(res.data);
+
+    localStorage.removeItem('isLoggedIn')
+    window.location.href='/'
+    window.location.reload();
+    
   };
 
   // --- Effect to close profile dropdown on outside click ---
@@ -75,7 +83,10 @@ export default function Navbar() {
     { title: "Notifications", icon: Bell, link: "notifications" },
     { title: "Support", icon: HelpCircle, link: "support" },
   ];
-
+  useEffect(()=>{
+    const loginStatus = localStorage.getItem('isLoggedIn');
+    setIsLoggedIn(loginStatus)
+  },[])
   return (
     <header className="h-14 flex items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
       {/* --- Left: Logo + Hamburger --- */}
@@ -148,6 +159,7 @@ export default function Navbar() {
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+
                     >
                       <Lock size={16} /> Log Out
                     </button>

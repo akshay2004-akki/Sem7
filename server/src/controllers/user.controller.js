@@ -110,6 +110,8 @@ export const logOutUser = asyncHandler(async (req, res) => {
 
 export const uploadAvatar = asyncHandler(async (req, res) => {
   const { user } = req;
+  console.log(req.files);
+  
   if (!req.file) {
     throw new ApiError(400, "Please upload an image");
   }
