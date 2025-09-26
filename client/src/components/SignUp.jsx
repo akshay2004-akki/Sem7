@@ -14,21 +14,53 @@ const GoogleIcon = () => (
 
 export default function SignUpSection() {
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState('');
+  // Updated state to match backend ('name' -> 'fullName')
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  // Updated handleSubmit to be an async function for API calls
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // --- Sign-Up Logic ---
-    // Here, you would validate the inputs and send them to your backend API
-    // to create a new user account.
-    if (!name || !email || !password) {
+    if (!fullName || !email || !password) {
       alert("Please fill in all fields.");
       return;
     }
-    console.log("Creating account for:", { name, email, password });
-    alert(`Account created for ${name}! Please check your email to verify.`);
+
+    // --- API Call Logic ---
+    // This is where you'll send the data to your backend.
+    try {
+      // Replace '/api/v1/users/register' with your actual API endpoint
+      const response = await fetch('/api/v1/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // The body includes fullName, email, and password as expected by your backend
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          // role and avatar will be handled by the backend as per your controller
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Handle successful registration
+        alert(`Account created for ${fullName}! Please check your email to verify.`);
+        // Optionally, redirect the user to the login page or dashboard
+        // window.location.href = '/login';
+      } else {
+        // Handle errors from the backend (e.g., email already exists)
+        alert(`Registration failed: ${data.message || 'Something went wrong.'}`);
+      }
+    } catch (error) {
+      // Handle network errors
+      console.error('Registration error:', error);
+      alert('An error occurred during registration. Please try again.');
+    }
   };
   
   const handleGoogleSignUp = () => {
@@ -46,7 +78,6 @@ export default function SignUpSection() {
         />
 
         <div className="relative w-full max-w-6xl flex rounded-2xl overflow-hidden shadow-lg shadow-cyan-500/10 border border-zinc-800">
-          
           
           <div className="hidden lg:flex flex-col justify-center items-center w-1/2 bg-zinc-900 p-12 text-center relative overflow-hidden">
              <div className="absolute -top-16 -left-16 w-48 h-48 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full opacity-20 blur-2xl"></div>
@@ -72,8 +103,8 @@ export default function SignUpSection() {
                 <input
                   type="text"
                   placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
                   required
                 />
@@ -147,3 +178,4 @@ export default function SignUpSection() {
     </div>
   );
 }
+
