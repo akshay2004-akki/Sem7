@@ -17,12 +17,14 @@ import {
   Search,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const navigate = useNavigate();
 
   const profileRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -46,7 +48,10 @@ export default function Navbar() {
   }, [isSidebarOpen]);
 
   // --- Handlers for login/logout state ---
-  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogin = () => {
+    setIsLoggedIn(true)
+    navigate('/login');
+  };
   const handleLogout = () => {
     setIsLoggedIn(false);
     setProfileOpen(false);
