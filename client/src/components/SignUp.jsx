@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, Briefcase } from 'lucide-react';
+import axios from 'axios';
 
 // A simple SVG for Google's icon
 const GoogleIcon = () => (
@@ -27,29 +28,19 @@ export default function SignUpSection() {
     }
 
     try {
-      const response = await fetch('/api/v1/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          password,
-          role, // Include role in the request body
-        }),
-      });
+      const res = await axios.post('http://localhost:8000/api/v1/users/register', {
+        fullName,
+        email,
+        password,
+        role
+      }, {withCredentials: true});
 
-      const data = await response.json();
+      console.log(res.data);
+      
 
-      if (response.ok) {
-        alert(`Account created for ${fullName}! Please check your email to verify.`);
-      } else {
-        alert(`Registration failed: ${data.message || 'Something went wrong.'}`);
-      }
     } catch (error) {
-      console.error('Registration error:', error);
-      alert('An error occurred during registration. Please try again.');
+      console.log(error.message);
+      
     }
   };
   
@@ -137,8 +128,8 @@ export default function SignUpSection() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 appearance-none"
                   required
                 >
-                  <option value="STUDENT">Student</option>
-                  <option value="INSTRUCTOR">Instructor</option>
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
                 </select>
               </div>
               
