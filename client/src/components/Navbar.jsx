@@ -12,7 +12,7 @@ import {
   Settings,
   User,
   X,
-  Book,
+  BookOpen,
   LayoutDashboard,
   Search,
 } from "lucide-react";
@@ -66,13 +66,13 @@ export default function Navbar() {
   const tabs = [
     { title: "Home", icon: Home, link: "" },
     { title: "Dashboard", icon: LayoutDashboard, link: "dashboard" },
-    { title: "Courses", icon: Book, link: "courses" },
+    { title: "Courses", icon: BookOpen, link: "courses" },
     { title: "Notifications", icon: Bell, link: "notifications" },
     { title: "Support", icon: HelpCircle, link: "support" },
   ];
 
   return (
-    <header className="h-14 flex shadow-[0_0.5px_10px_0_#00ffff] items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
+    <header className="h-14 flex  items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
       {/* --- Left: Logo + Hamburger --- */}
       <div className="flex items-center gap-3">
         <button
