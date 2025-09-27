@@ -105,12 +105,11 @@ export const logOutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json({ data: {}, message: "User logged out successfully" });
+    .json({ data: {}, message: "User logged out successfully" }); 
 });
 
 export const uploadAvatar = asyncHandler(async (req, res) => {
   const { user } = req;
-  console.log(req.files);
   
   if (!req.file) {
     throw new ApiError(400, "Please upload an image");
@@ -118,7 +117,7 @@ export const uploadAvatar = asyncHandler(async (req, res) => {
   console.log("req.file", req.file);
 
   const uploadedImage = await uploadOnCloudinary(
-    req.file.buffer,
+    req.file.path,
     `avatars/${user._id}`
   );
 

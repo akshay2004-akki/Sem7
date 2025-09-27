@@ -113,17 +113,27 @@ export const getCourseById = asyncHandler(async (req, res) => {
   if (!courseId || !isValidObjectId(courseId)) {
     throw new ApiError(400, "Invalid course ID");
   }
+
   const course = await Course.findById(courseId)
     .populate("instructorId", "fullName email")
-    .populate("sections");
+    .populate({
+      path: "sections",
+      populate: {
+        path: "lectures",
+        model: "Lecture", // 👈 make sure this matches your model name
+      },
+    });
+
   if (!course) {
     throw new ApiError(404, "Course not found");
   }
+
   return res.status(200).json({
     course,
     message: "Course retrieved successfully",
   });
 });
+
 
 export const getInstructorCourses = asyncHandler(async (req, res) => {
   const { instructorId } = req.params;
@@ -158,7 +168,7 @@ export const getAllCourses = asyncHandler(async (req, res) => {
   });
 });
 
-export const browseCourses = asyncHandler(async (req, res) => {
+export const browseCourses = asyncHandler(async (req, res) => { 
   try {
     const { search } = req.query;
 

@@ -23,6 +23,8 @@ import LoginSection from './components/Login';
 import SignUpSection from './components/SignUp';
 import SettingsSection from './components/Settings';
 import SupportSection from './components/Support';
+import CourseDetails from './components/CourseDetails';
+import LecturePage from './components/LecturePage';
 
 
 function App() {
@@ -71,6 +73,8 @@ function App() {
           <Route path='/signup' element = {<SignUpSection/>} ></Route>
           <Route path='/settings' element = {<SettingsSection/>} ></Route>
           <Route path='/support' element = {<SupportSection/>} ></Route>
+          <Route path='/courses/:courseId' element={<CourseDetails/>} />
+          <Route path="/course/:courseId/lecture/:lectureId" element = {<LecturePage/>}/>
         </Routes>
         <Footer/>
        </Router>

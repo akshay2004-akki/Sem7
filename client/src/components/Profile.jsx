@@ -37,27 +37,39 @@ export default function UserProfile() {
   };
 
   const handleAvatarUpload = async (e) => {
-    console.log(e);
-    
-    const file = e.target.files[0];
-    console.log(file);
-    
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    try {
-      const res = await axios.post("http://localhost:8000/api/v1/users/upload-avatar", {file}, { withCredentials: true });
-      const permanentUrl = res.data.data.avatar;
-      // This line updates the user state, causing all components using user.avatar to re-render
-      setUser(prev => ({ ...prev, avatar: permanentUrl }));
-      setAvatarPreview(permanentUrl); 
-      showNotification("Avatar updated successfully!", "success");
-    } catch (err) {
-      showNotification(err.response?.data?.message || "Upload failed", "error");
-      setAvatarPreview(user.avatar);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  setIsUploading(true);
+
+  const formData = new FormData();
+  formData.append("avatar", file); // backend expects req.file
+
+  try {
+    const res = await axios.post(
+      "http://localhost:8000/api/v1/users/upload-avatar",
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    const updatedUser = res.data.updatedUser;
+    setUser(prev => ({ ...prev, avatar: updatedUser.avatar }));
+    setAvatarPreview(updatedUser.avatar);
+    showNotification("Avatar updated successfully!", "success");
+  } catch (err) {
+    console.error("Avatar upload error:", err.response?.data || err.message);
+    showNotification(err.response?.data?.message || "Upload failed", "error");
+    setAvatarPreview(user.avatar);
+  } finally {
+    setIsUploading(false);
+  }
+};
+
 
   const handleChangePassword = async (e) => {
     e.preventDefault();

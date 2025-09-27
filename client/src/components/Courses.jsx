@@ -1,110 +1,35 @@
 import React from "react";
 import SplitText from "./SplitText";
 import {CardCarousel} from "@/components/ui/card-carousel"; // Import your carousel
+import { useEffect } from "react";
+import axios from "axios";
+import { useState } from "react";
 
 function Courses() {
-  const handleAnimationComplete = () => {
-    console.log("All letters have animated!");
-  };
 
+  const [courses, setCourses] = useState([])
   const handleNavigate = (courseId) => {
     // Later you can replace this with react-router navigate(`/courses/${courseId}`)
     console.log(`Navigate to course with ID: ${courseId}`);
+    window.location.href = `/courses/${courseId}`; // Simple redirect for now
   };
 
-  // Example courses array
- const courses = [
-  {
-    id: 1,
-    title: "Web Development Bootcamp",
-    description: "Learn HTML, CSS, JavaScript, and React from scratch.",
-    category: "Development",
-    thumbnail: "/assets/logo.png",
-    price: 499,
-    currency: "INR",
-  },
-  {
-    id: 2,
-    title: "Data Structures & Algorithms",
-    description: "Master problem-solving and coding interview preparation.",
-    category: "Programming",
-    thumbnail: "/assets/student.png",
-    price: 799,
-    currency: "INR",
-  },
-  {
-    id: 3,
-    title: "Machine Learning Essentials",
-    description: "Build ML models and understand core AI concepts.",
-    category: "AI/ML",
-    thumbnail: "/assets/herologo.png",
-    price: 999,
-    currency: "INR",
-  },
-  {
-    id: 5,
-    title: "Advanced JavaScript",
-    description: "Deep dive into ES6+, async programming, and performance.",
-    category: "Programming",
-    thumbnail: "/assets/student.png",
-    price: 699,
-    currency: "INR",
-  },
-  {
-    id: 6,
-    title: "React & Redux Mastery",
-    description: "Build scalable front-end apps using React and Redux.",
-    category: "Development",
-    thumbnail: "/assets/herologo.png",
-    price: 899,
-    currency: "INR",
-  },
-  {
-    id: 7,
-    title: "Python for Beginners",
-    description: "Get started with Python basics and real-world projects.",
-    category: "Programming",
-    thumbnail: "/assets/logo.png",
-    price: 399,
-    currency: "INR",
-  },
-  {
-    id: 8,
-    title: "Node.js & Express Guide",
-    description: "Master backend development with Node.js and Express.",
-    category: "Development",
-    thumbnail: "/assets/student.png",
-    price: 749,
-    currency: "INR",
-  },
-  {
-    id: 10,
-    title: "Full Stack Development",
-    description: "Become a MERN stack developer with hands-on projects.",
-    category: "Development",
-    thumbnail: "/assets/logo.png",
-    price: 1299,
-    currency: "INR",
-  },
-  {
-    id: 15,
-    title: "Artificial Intelligence Basics",
-    description: "Introduction to AI, neural networks, and applications.",
-    category: "AI/ML",
-    thumbnail: "/assets/herologo.png",
-    price: 1099,
-    currency: "INR",
-  },
-  {
-    id: 16,
-    title: "Deep Learning with TensorFlow",
-    description: "Train neural networks using TensorFlow & Keras.",
-    category: "AI/ML",
-    thumbnail: "/assets/logo.png",
-    price: 1299,
-    currency: "INR",
-  },
-];
+  useEffect(()=>{
+    const fetchCourses = async()=>{
+      try {
+        const  res = await axios.get("http://localhost:8000/api/v1/courses/getAllCourses", {withCredentials:true});
+        console.log(res.data);
+        setCourses(res.data.courses)
+      } catch (error) {
+        console.log(error.message);
+        
+      }
+    }
+
+    fetchCourses();
+  },[])
+
+
 
 
   // Group courses by category
@@ -134,7 +59,6 @@ function Courses() {
               threshold={0.1}
               rootMargin="-100px"
               textAlign="center"
-              onLetterAnimationComplete={handleAnimationComplete}
             />
 
             {/* Underlines */}
