@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Video, Clock } from "lucide-react";
 import axios from "axios";
-import ReactPlayer from "react-player";
 
 const LecturePage = () => {
   const { courseId, lectureId } = useParams();
@@ -36,6 +35,8 @@ const LecturePage = () => {
 
     fetchCourse();
   }, [courseId, lectureId]);
+
+  
 
   if (loading) {
     return (
@@ -94,17 +95,15 @@ const LecturePage = () => {
           {currentLecture.title}
         </h1>
 
-        {/* Responsive ReactPlayer */}
+        {/* Responsive Video Player */}
         {currentLecture.type === "video" && currentLecture.content ? (
           <div className="w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-xl mb-6">
-            <ReactPlayer
+            <video
               key={currentLecture._id}
-              url={currentLecture.content}
               controls
-              playing
-              width="100%"
-              height="100%"
-              className="bg-black"
+              autoPlay
+              className="w-full h-full object-cover bg-black"
+              src={currentLecture.content}
             />
           </div>
         ) : (

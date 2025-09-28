@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { Course } from "../models/courses.model.js";
 import { isValidObjectId } from "mongoose";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { User } from "../models/user.model.js";
 
 export const createCourse = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
@@ -13,13 +14,14 @@ export const createCourse = asyncHandler(async (req, res) => {
   if (!title || !description || !category || !price || !language) {
     throw new ApiError(400, "All fields are required");
   }
-
-  if (!req.file || !req.file.buffer) {
+  console.log(req.file);
+  
+  if (!req.file) {
     throw new ApiError(400, "Course thumbnail image is required");
   }
 
   const uploadedImage = await uploadOnCloudinary(
-    req.file.buffer,
+    req.file.path,
     `thumbnail/${userId}`
   );
 
@@ -182,6 +184,62 @@ export const browseCourses = asyncHandler(async (req, res) => {
 });
 
 export const enrollInCourse = asyncHandler(async(req,res)=>{
-  const {courtseId} = req.params
-})
+  const {courseId} = req.params;
+  const userId = req.user?._id;
+  if(!courseId || !isValidObjectId(courseId)){
+    throw new ApiError(400, "Invalid course ID");
+  }
+  if(!userId || !isValidObjectId(userId)){
+    throw new ApiError(400, "Invalid user ID");
+  }
+  const course = await Course.findById(courseId);
+  if(!course){
+    throw new ApiError(404, "Course not found");
+  }   
+  const user = await User.findById(userId);
+  if(user.enrolledCourses.includes(courseId)){
+    throw new ApiError(400, "You are already enrolled in this course");
+  }
+  user.enrolledCourses.push(courseId);
+  await user.save();
+  return res.status(200).json({
+    message: "Enrolled in course successfully"
+  });
+});
+
+export const getEnrolledCourses = asyncHandler(async(req,res)=>{
+  const userId = req.user?._id;
+  if(!userId || !isValidObjectId(userId)){
+    throw new ApiError(400, "Invalid user ID");
+  }
+  const user = await User.findById(userId).populate("enrolledCourses");
+  if(!user){
+    throw new ApiError(404, "User not found");
+  } 
+  return res.status(200).json({
+    enrolledCourses: user.enrolledCourses,
+    message: "Enrolled courses retrieved successfully"
+  });
+});
+
+export const isUserEnrolled = asyncHandler(async(req,res)=>{
+  const userId = req.user?._id;
+  const {courseId} = req.params;
+  if(!courseId || !isValidObjectId(courseId)){
+    throw new ApiError(400, "Invalid course ID");
+  }
+  if(!userId || !isValidObjectId(userId)){
+    throw new ApiError(400, "Invalid user ID");
+  }
+  const user = await User.findById(userId);
+  if(!user){
+    throw new ApiError(404, "User not found");
+  } 
+  const isEnrolled = user.enrolledCourses.includes(courseId);
+  return res.status(200).json({
+    isEnrolled,
+    message: "Enrollment status retrieved successfully"
+  });
+});
+
 

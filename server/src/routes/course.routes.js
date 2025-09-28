@@ -1,6 +1,6 @@
 import {verifyJWT} from '../middleware/auth.middleware.js';
 import {Router} from 'express';
-import { createCourse, updateCourse, getAllCourses, getCourseById, deleteCourse, browseCourses, getInstructorCourses } from '../controllers/course.controller.js';
+import { createCourse, updateCourse, getAllCourses, getCourseById, deleteCourse, browseCourses, getInstructorCourses, enrollInCourse, getEnrolledCourses, isUserEnrolled } from '../controllers/course.controller.js';
 import { upload } from '../middleware/multer.middleware.js';
 
 const router = Router();
@@ -11,6 +11,10 @@ router.get('/getAllCourses', getAllCourses);
 router.get('/getCourseById/:courseId', getCourseById);
 router.delete('/deleteCourse/:courseId', verifyJWT, deleteCourse);
 router.get('/browseCourses', browseCourses);
-router.get('/getInstructorCourses/:instructorId',verifyJWT ,getInstructorCourses); 
+router.get('/getInstructorCourses/:instructorId',verifyJWT ,getInstructorCourses);
+router.put('/enroll/:courseId', verifyJWT, enrollInCourse)
+router.get('getEnrolledCourses', verifyJWT, getEnrolledCourses)
+router.get('/isEnrolled/:courseId', verifyJWT, isUserEnrolled)
+
 
 export default router; 
