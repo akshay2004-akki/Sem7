@@ -32,10 +32,11 @@ export default function LoginSection() {
       if (res.status===200) {
         // --- KEY CHANGE: Save login state to local storage ---
         localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userId', res.data.loggedInUser._id);
         
         // Save user avatar if it exists in the API response
-        if (res.data.user && res.data.user.avatar) {
-          localStorage.setItem('userAvatar', res.data.user.avatar);
+        if (res.data.loggedInUser && res.data.loggedInUser.avatar) {
+          localStorage.setItem('userAvatar', res.data.loggedInUser.avatar);
         }
 
         alert('Login successful!');

@@ -9,6 +9,13 @@ const CourseDetails = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
 
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [avg, setAvg] = useState(0);
+
   // Fetch course details
   useEffect(() => {
     const fetchDetails = async () => {
@@ -24,6 +31,25 @@ const CourseDetails = () => {
     };
     fetchDetails();
   }, [courseId]);
+
+  // Fetch reviews (paginated)
+  const fetchReviews = async (pageNum = 1) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/reviews/${courseId}?page=${pageNum}&limit=2`,
+        { withCredentials: true }
+      );
+      setReviews(res.data.reviews);
+      setPage(res.data.page);
+      setTotalPages(res.data.totalPages);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews(page);
+  }, [courseId, page]);
 
   // Check login status
   useEffect(() => {
@@ -60,7 +86,30 @@ const CourseDetails = () => {
         { withCredentials: true }
       );
       alert(res.data.message);
-      setIsEnrolled(true); // ✅ update enrollment state
+      setIsEnrolled(true);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  // Submit review
+  const handleReviewSubmit = async () => {
+    if (!loggedIn || !isEnrolled) {
+      alert("You must be enrolled to leave a review.");
+      return;
+    }
+    try {
+      const userId = localStorage.getItem("userId");
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/reviews/${courseId}/${userId}`,
+        newReview,
+        { withCredentials: true }
+      );
+      alert(res.data.message);
+
+      // Refresh reviews after posting
+      fetchReviews(1);
+      setNewReview({ rating: 0, comment: "" });
     } catch (error) {
       console.log(error.message);
     }
@@ -71,6 +120,20 @@ const CourseDetails = () => {
     const url = `/course/${courseId}/lecture/${lecture._id}`;
     window.open(url, "_blank");
   };
+
+  useEffect(()=>{
+    const averagerating = async()=>{
+      try {
+        const res = await axios.get(`http://localhost:8000/api/v1/reviews/average/${courseId}`, {withCredentials:true});
+        setAvg(res.data.averageRating);
+      } catch (error) {
+        console.log(error.message);
+        
+      }
+    }
+
+    averagerating();
+  },[courseId])
 
   if (!details) {
     return (
@@ -163,22 +226,74 @@ const CourseDetails = () => {
         </div>
       </div>
 
-      {/* Instructor Section */}
+      {/* Reviews Section */}
       <div className="max-w-6xl mx-auto mt-16">
-        <h2 className="text-2xl font-semibold mb-6">Instructor</h2>
-        <div className="flex items-center gap-6 bg-gray-900 p-6 rounded-xl">
-          <img
-            src="https://source.unsplash.com/150x150/?person,developer"
-            alt="Instructor"
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <div>
-            <h3 className="text-xl font-semibold">
-              {details.instructorId?.fullName}
-            </h3>
-            <p className="text-gray-400">{details.instructorId?.email}</p>
-          </div>
+        <h2 className="text-2xl font-semibold mb-6">Course Reviews : <span className="text-[25px]">{avg}</span>/<span className="text-sm">5.0</span> </h2>
+
+        {/* Existing Reviews */}
+        <div className="space-y-4">
+          {reviews.map((review) => (
+            <div
+              key={review._id}
+              className="bg-gray-900 p-4 rounded-lg shadow-md"
+            >
+              <p className="text-sm text-gray-400">
+                {review.userId?.fullName || "Anonymous"}
+              </p>
+              <p className="text-yellow-400">⭐ {review.rating}</p>
+              <p>{review.comment}</p>
+            </div>
+          ))}
         </div>
+
+        {/* Pagination Controls */}
+        <div className="flex gap-3 mt-4">
+          <button
+            disabled={page === 1}
+            onClick={() => fetchReviews(page - 1)}
+            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            disabled={page === totalPages}
+            onClick={() => fetchReviews(page + 1)}
+            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        {/* Add Review Form */}
+        {isEnrolled && loggedIn && (
+          <div className="mt-8 bg-gray-900 p-6 rounded-xl shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={newReview.rating}
+              onChange={(e) =>
+                setNewReview({ ...newReview, rating: e.target.value })
+              }
+              className="w-20 p-2 rounded bg-gray-800 text-white"
+            />
+            <textarea
+              value={newReview.comment}
+              onChange={(e) =>
+                setNewReview({ ...newReview, comment: e.target.value })
+              }
+              className="w-full p-3 mt-4 rounded bg-gray-800 text-white"
+              placeholder="Write your review..."
+            />
+            <button
+              onClick={handleReviewSubmit}
+              className="mt-4 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl"
+            >
+              Submit Review
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

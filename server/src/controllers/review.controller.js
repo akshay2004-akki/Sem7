@@ -18,6 +18,7 @@ export const createReview = asyncHandler(async (req, res) => {
     userId,
   });
   if (existingReview) {
+    res.status(400).json({ message: "You have already reviewed this course" });
     throw new ApiError(400, "You have already reviewed this course");
   }
   const review = await Review.create({
@@ -34,22 +35,21 @@ export const createReview = asyncHandler(async (req, res) => {
 
 export const getReviewByCourse = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
+  const { page = 1, limit = 5 } = req.query;
 
-  if (!isValidObjectId(courseId)) {
-    throw new ApiError(400, "Invalid course ID");
-  }
   const reviews = await Review.find({ courseId })
-    .populate("userId", "name email")
-    .sort({ createdAt: -1 });
+    .populate("userId", "fullName email")
+    .skip((page - 1) * limit)
+    .limit(parseInt(limit));
 
-  if (!reviews || reviews.length === 0) {
-    return res
-      .status(404)
-      .json({ message: "No reviews found for this course" });
-  }
-  return res
-    .status(200)
-    .json({ message: "Reviews fetched successfully", reviews });
+  const total = await Review.countDocuments({ courseId });
+
+  return res.status(200).json({
+    reviews,
+    total,
+    page: parseInt(page),
+    totalPages: Math.ceil(total / limit),
+  });
 });
 
 export const getAverageRating = asyncHandler(async (req, res) => {
@@ -80,7 +80,7 @@ export const getAverageRating = asyncHandler(async (req, res) => {
   const { averageRating, totalReviews } = result[0];
   res.status(200).json({
     success: true,
-    averageRating: averageRating.toFixed(2),
+    averageRating: averageRating.toFixed(1),
     totalReviews,
   });
 });
