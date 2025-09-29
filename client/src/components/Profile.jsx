@@ -169,7 +169,7 @@ export default function UserProfile() {
                 <img
                   src={user?.avatar}
                   alt={user.fullName}
-                  className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-cyan-500 shadow-lg"
+                  className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-cyan-500 shadow-lg"
                 />
                 <h2 className="text-2xl font-bold text-white">
                   {user.fullName}
