@@ -77,9 +77,11 @@ export const deleteSection = async (req, res) => {
     );
     await course.save({validateBeforeSave: false});
 
-    await section.remove();
+    await section.deleteOne({_id : sectionId});
     res.status(200).json({ message: "Section deleted" });
   } catch (err) {
+    console.log(err.message);
+    
     res.status(500).json({ message: "Server error" });
   }
 };

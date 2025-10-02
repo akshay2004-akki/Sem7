@@ -5,7 +5,7 @@ import { addSection, updateSection, deleteSection} from '../controllers/section.
 const router = Router();
 
 router.post("/addSection/:courseId", verifyJWT, addSection);
-router.put("/updateSection/:sectionId", verifyJWT, updateSection);
+router.put("/updateSection/:sectionId", verifyJWT, updateSection); 
 router.delete("/deleteSection/:sectionId", verifyJWT, deleteSection);
 
 export default router;

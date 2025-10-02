@@ -198,7 +198,7 @@ const CourseDetails = () => {
           {details.sections?.map((section, i) => (
             <div
               key={section._id}
-              className="bg-gray-900 p-6 rounded-xl shadow-md"
+              className="bg-black p-6 rounded-xl shadow-md"
             >
               <h3 className="text-lg font-semibold mb-4">
                 {i + 1}. {section.title}
@@ -207,7 +207,7 @@ const CourseDetails = () => {
                 {section.lectures?.map((lecture) => (
                   <div
                     key={lecture._id}
-                    className="flex items-center justify-between bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition"
+                    className="flex items-center justify-between bg-black p-3 rounded-lg hover:bg-gray-700 transition"
                   >
                     <span>{lecture.title}</span>
                     {isEnrolled && loggedIn && (

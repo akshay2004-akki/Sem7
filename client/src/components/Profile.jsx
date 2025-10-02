@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import {
   Mail,
@@ -7,8 +8,12 @@ import {
   Award,
   Settings,
   Save,
+  Menu,
+  X,
+  FileText,
 } from "lucide-react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // --- Main Profile Component ---
 export default function UserProfile() {
@@ -18,6 +23,11 @@ export default function UserProfile() {
   const [isPasswordUpdating, setIsPasswordUpdating] = useState(false);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile nav
+  const [thumbnail, setThumbnail] = useState(null);
+  const [instructorCourses, setInstructorCorses] = useState([]);
+
+  const navigate = useNavigate();
 
   // Fetch user data from backend
   useEffect(() => {
@@ -27,15 +37,63 @@ export default function UserProfile() {
           "http://localhost:8000/api/v1/users/profile",
           { withCredentials: true }
         );
-        console.log(res.data.user);
-
         setUser(res.data.user);
+
+        const res2 = await axios.get(
+          `http://localhost:8000/api/v1/courses/getInstructorCourses/${res.data.user._id}`,
+          { withCredentials: true }
+        );
+        setInstructorCorses(res2.data.courses);
       } catch (err) {
         console.error("Failed to fetch user:", err);
       }
     };
     fetchUser();
   }, []);
+
+  // --- Start of newly added/modified logic for responsive tabs ---
+
+  // Define tabs as a data structure to avoid repetition
+  const navTabs = [
+    {
+      id: "courses",
+      label: "Enrolled Courses",
+      icon: BookOpen,
+      roles: ["student", "instructor", "admin"],
+    },
+    {
+      id: "wishlist",
+      label: "Wishlist",
+      icon: Award,
+      roles: ["student", "instructor", "admin"],
+    },
+    {
+      id: "settings",
+      label: "Account Settings",
+      icon: Settings,
+      roles: ["student", "instructor", "admin"],
+    },
+    {
+      id: "create-course",
+      label: "Create Course",
+      icon: BookOpen,
+      roles: ["instructor", "admin"],
+    },
+    {
+      id: "manage-courses",
+      label: "Manage Courses",
+      icon: FileText,
+      roles: ["instructor", "admin"],
+    },
+  ];
+
+  // Filter tabs based on the current user's role
+  const availableTabs = user
+    ? navTabs.filter((tab) => tab.roles.includes(user.role))
+    : [];
+  const currentTabInfo = availableTabs.find((tab) => tab.id === activeTab);
+
+  // --- End of new logic ---
 
   if (!user) {
     return (
@@ -56,7 +114,7 @@ export default function UserProfile() {
     setIsUploading(true);
 
     const formData = new FormData();
-    formData.append("avatar", file); // backend expects req.file
+    formData.append("avatar", file);
 
     try {
       const res = await axios.post(
@@ -150,6 +208,42 @@ export default function UserProfile() {
     }
   };
 
+  // Handle course creation
+  const handleCourseCreation = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("title", e.target.title.value);
+    formData.append("description", e.target.description.value);
+    formData.append("price", e.target.price.value);
+    formData.append("category", e.target.category.value);
+    formData.append("language", e.target.language.value);
+    formData.append("thumbnail", e.target.thumbnail.files[0]);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/courses/createCourse",
+        formData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      alert("Course created successfully!");
+      e.target.reset();
+    } catch (err) {
+      console.error("Course creation error:", err.response?.data || err);
+      alert(err.response?.data?.message || "Failed to create course.");
+    }
+  };
+
+  const handleNavigate = (courseId) => {
+    navigate(`/course/manage/${courseId}`);
+  };
+
+  const handleNavigateToCourse = (courseId) => {
+    navigate(`/courses/${courseId}`);
+  };
+
   return (
     <div className="bg-black min-h-screen text-gray-300 font-sans p-4 sm:p-6 lg:p-8 pt-32">
       <div className="max-w-7xl mx-auto">
@@ -196,43 +290,64 @@ export default function UserProfile() {
           <div className="lg:col-span-2">
             <div className="bg-black rounded-2xl border border-zinc-800 h-full">
               {/* Tab Navigation */}
-              <div className="border-b border-zinc-700">
-                <nav className="flex space-x-2 p-2">
+              <div className="border-b border-zinc-700 relative">
+                {/* --- Mobile Navigation --- */}
+                <div className="lg:hidden p-2">
                   <button
-                    onClick={() => setActiveTab("courses")}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md ${
-                      activeTab === "courses"
-                        ? "bg-zinc-800 text-white"
-                        : "text-gray-400 hover:bg-zinc-800/50"
-                    }`}
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md bg-zinc-800 text-white"
                   >
-                    <BookOpen size={16} /> My Courses
+                    <span className="flex items-center gap-2">
+                      {currentTabInfo?.icon && (
+                        <currentTabInfo.icon size={16} />
+                      )}
+                      {currentTabInfo?.label}
+                    </span>
+                    {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                   </button>
-                  <button
-                    onClick={() => setActiveTab("wishlist")}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md ${
-                      activeTab === "wishlist"
-                        ? "bg-zinc-800 text-white"
-                        : "text-gray-400 hover:bg-zinc-800/50"
-                    }`}
-                  >
-                    <Award size={16} /> Wishlist
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("settings")}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md ${
-                      activeTab === "settings"
-                        ? "bg-zinc-800 text-white"
-                        : "text-gray-400 hover:bg-zinc-800/50"
-                    }`}
-                  >
-                    <Settings size={16} /> Account Settings
-                  </button>
+                  {isMobileMenuOpen && (
+                    <div className="absolute top-full left-0 w-full bg-zinc-900 border border-zinc-700 rounded-b-lg shadow-lg z-10 p-2 mt-1">
+                      {availableTabs.map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => {
+                            setActiveTab(tab.id);
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={`w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md ${
+                            activeTab === tab.id
+                              ? "bg-zinc-700 text-white"
+                              : "text-gray-400 hover:bg-zinc-800/50"
+                          }`}
+                        >
+                          <tab.icon size={16} /> {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* --- Desktop Navigation --- */}
+                <nav className="hidden lg:flex space-x-2 p-2">
+                  {availableTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md ${
+                        activeTab === tab.id
+                          ? "bg-zinc-800 text-white"
+                          : "text-gray-400 hover:bg-zinc-800/50"
+                      }`}
+                    >
+                      <tab.icon size={16} /> {tab.label}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
               {/* Tab Content */}
               <div className="p-6 min-h-[400px]">
+                {/* --- My Courses --- */}
                 {activeTab === "courses" && (
                   <div className="space-y-4">
                     {user.enrolledCourses.length === 0 && (
@@ -243,29 +358,40 @@ export default function UserProfile() {
                     {user.enrolledCourses.map((course) => (
                       <div
                         key={course._id}
-                        className="bg-zinc-800 p-4 rounded-lg flex gap-4 items-start hover:bg-zinc-700 transition"
+                        className="bg-zinc-800 p-4 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 hover:bg-zinc-700 transition"
                       >
-                        {/* Thumbnail */}
-                        <img
-                          src={course.thumbnail}
-                          alt={course.title}
-                          className="w-24 h-16 object-cover rounded-md shadow-md"
-                        />
-
                         {/* Course Info */}
-                        <div>
-                          <h4 className="font-semibold text-white">
-                            {course.title}
-                          </h4>
-                          <p className="text-sm text-gray-400 line-clamp-2">
-                            {course.description}
-                          </p>
+                        <div className="flex gap-4 flex-1">
+                          <img
+                            src={course.thumbnail}
+                            alt={course.title}
+                            className="w-24 h-16 object-cover rounded-md shadow-md flex-shrink-0"
+                          />
+                          <div className="flex flex-col justify-between">
+                            <h4 className="font-semibold text-white">
+                              {course.title}
+                            </h4>
+                            <p className="text-sm text-gray-400 line-clamp-2">
+                              {course.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="flex justify-end mt-2 sm:mt-0">
+                          <button
+                            onClick={() => handleNavigateToCourse(course._id)}
+                            className="bg-cyan-500 text-black px-4 py-2 rounded-xl hover:bg-cyan-400 transition"
+                          >
+                            Go to course
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
 
+                {/* --- Wishlist --- */}
                 {activeTab === "wishlist" && (
                   <div className="space-y-4">
                     {user.wishlist.length === 0 && (
@@ -276,14 +402,11 @@ export default function UserProfile() {
                         key={course._id}
                         className="bg-zinc-800 p-4 rounded-lg flex gap-4 items-start hover:bg-zinc-700 transition"
                       >
-                        {/* Thumbnail */}
                         <img
                           src={course.thumbnail}
                           alt={course.title}
                           className="w-24 h-16 object-cover rounded-md shadow-md"
                         />
-
-                        {/* Course Info */}
                         <div>
                           <h4 className="font-semibold text-white">
                             {course.title}
@@ -296,11 +419,12 @@ export default function UserProfile() {
                     ))}
                   </div>
                 )}
+
+                {/* --- Settings --- */}
                 {activeTab === "settings" && (
                   <div className="space-y-10">
-                    {/* --- Account Info Form (Existing) --- */}
+                    {/* Account Info */}
                     <form onSubmit={handleFormSubmit} className="space-y-6">
-                      {/* Full Name */}
                       <div>
                         <label
                           htmlFor="fullName"
@@ -317,8 +441,6 @@ export default function UserProfile() {
                           className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2"
                         />
                       </div>
-
-                      {/* Email */}
                       <div>
                         <label
                           htmlFor="email"
@@ -335,8 +457,6 @@ export default function UserProfile() {
                           className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-gray-400 cursor-not-allowed"
                         />
                       </div>
-
-                      {/* Save Button for Profile Details */}
                       <div className="flex justify-end">
                         <button
                           type="submit"
@@ -347,7 +467,7 @@ export default function UserProfile() {
                       </div>
                     </form>
 
-                    {/* --- Avatar Section (Existing) --- */}
+                    {/* Avatar Upload */}
                     <div className="border-t border-zinc-700 pt-6">
                       <h3 className="text-lg font-semibold text-white mb-4">
                         Change Avatar
@@ -370,7 +490,7 @@ export default function UserProfile() {
                       </div>
                     </div>
 
-                    {/* --- Change Password Section --- */}
+                    {/* Change Password */}
                     <div className="border-t border-zinc-700 pt-6">
                       <h3 className="text-lg font-semibold text-white mb-4">
                         Change Password
@@ -379,7 +499,6 @@ export default function UserProfile() {
                         onSubmit={handleChangePassword}
                         className="space-y-6"
                       >
-                        {/* Current Password */}
                         <div>
                           <label
                             htmlFor="currentPassword"
@@ -395,8 +514,6 @@ export default function UserProfile() {
                             placeholder="••••••••"
                           />
                         </div>
-
-                        {/* New Password */}
                         <div>
                           <label
                             htmlFor="newPassword"
@@ -412,8 +529,6 @@ export default function UserProfile() {
                             placeholder="••••••••"
                           />
                         </div>
-
-                        {/* Save Button for Password */}
                         <div className="flex justify-end">
                           <button
                             type="submit"
@@ -424,6 +539,182 @@ export default function UserProfile() {
                         </div>
                       </form>
                     </div>
+                  </div>
+                )}
+
+                {/* --- Create Course --- */}
+                {activeTab === "create-course" && (
+                  <div className="space-y-8">
+                    <h3 className="text-xl font-semibold text-white">
+                      Create a New Course
+                    </h3>
+                    <form onSubmit={handleCourseCreation} className="space-y-6">
+                      <div>
+                        <label
+                          htmlFor="title"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Course Title
+                        </label>
+                        <input
+                          type="text"
+                          id="title"
+                          name="title"
+                          required
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2"
+                          placeholder="Enter course title"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Description
+                        </label>
+                        <textarea
+                          id="description"
+                          name="description"
+                          required
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 h-24"
+                          placeholder="Enter course description"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="thumbnail"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Course Thumbnail
+                        </label>
+                        <input
+                          type="file"
+                          id="thumbnail"
+                          name="thumbnail"
+                          accept="image/*"
+                          onChange={(e) => setThumbnail(e.target.files[0])}
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="price"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Price
+                        </label>
+                        <input
+                          type="number"
+                          id="price"
+                          name="price"
+                          min="0"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2"
+                          placeholder="Enter price"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="category"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Category
+                        </label>
+                        <select
+                          name="category"
+                          id="category"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2"
+                        >
+                          <option value="Development">Development</option>
+                          <option value="Business">Business</option>
+                          <option value="Finance">Finance</option>
+                          <option value="IT-software">IT & Software</option>
+                          <option value="Analystics">Analytics</option>
+                          <option value="Marketing">Marketing</option>
+                          <option value="Health">Health & Fitness</option>
+                          <option value="music">Music</option>
+                          <option value="personal-development">
+                            Personal Development
+                          </option>
+                          <option value="design">Design</option>
+                          <option value="photography">Photography</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="language"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Language
+                        </label>
+                        <input
+                          type="text"
+                          id="language"
+                          name="language"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2"
+                          placeholder="e.g. English"
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          className="bg-cyan-500 text-black font-semibold py-2 px-6 rounded-lg hover:bg-cyan-400"
+                        >
+                          Create Course
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+                {activeTab === "manage-courses" && (
+                  <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
+                    <h3 className="text-xl font-semibold text-white">
+                      Manage My Courses
+                    </h3>
+
+                    {instructorCourses.length === 0 ? (
+                      <p className="text-gray-400">
+                        You have not created any courses yet.
+                      </p>
+                    ) : (
+                      <div className="space-y-4">
+                        {instructorCourses.map((course) => (
+                          <div
+                            key={course._id}
+                            className="bg-zinc-800 p-4 rounded-lg flex flex-col md:flex-row gap-4 md:items-center hover:bg-zinc-700 transition-all duration-200"
+                          >
+                            {/* Course Thumbnail */}
+                            <img
+                              src={course.thumbnail}
+                              alt={course.title}
+                              className="w-full h-40 md:w-28 md:h-20 object-cover rounded-md shadow-md flex-shrink-0"
+                            />
+
+                            {/* Course Info */}
+                            <div className="flex-1 flex flex-col justify-between">
+                              <h4 className="font-semibold text-white text-lg md:text-base">
+                                {course.title}
+                              </h4>
+                              <p className="text-sm text-gray-400 line-clamp-2 mt-1">
+                                {course.description.slice(0, 80)}...
+                              </p>
+                              <p className="text-xs text-gray-500 mt-2">
+                                Price: {course.price} {course.currency || "$"}
+                              </p>
+                            </div>
+
+                            {/* Action Button */}
+                            <div className="flex justify-center md:justify-end mt-3 md:mt-0">
+                              <button
+                                onClick={() => handleNavigate(course._id)}
+                                className="bg-cyan-500 px-4 py-2 rounded-2xl text-black hover:bg-cyan-400 transition"
+                              >
+                                Manage Course
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

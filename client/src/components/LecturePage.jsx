@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Video, Clock } from "lucide-react";
 import axios from "axios";
@@ -8,6 +8,9 @@ const LecturePage = () => {
   const [sections, setSections] = useState([]);
   const [currentLecture, setCurrentLecture] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const videoRef = useRef(null);
+  const lastUpdateRef = useRef(0); // track last API call timestamp
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -20,11 +23,9 @@ const LecturePage = () => {
         const course = res.data.course;
 
         setSections(course.sections || []);
-
         const allLectures = course.sections?.flatMap((s) => s.lectures) || [];
         const lecture =
           allLectures.find((l) => l._id === lectureId) || allLectures[0];
-
         setCurrentLecture(lecture);
       } catch (err) {
         console.error("Error fetching course:", err);
@@ -36,7 +37,38 @@ const LecturePage = () => {
     fetchCourse();
   }, [courseId, lectureId]);
 
-  
+  // Function to send progress update
+  const handleProgressUpdate = async () => {
+    const now = Date.now();
+
+    // Throttle updates: only once every 10 seconds
+    if (now - lastUpdateRef.current < 3000) return;
+    lastUpdateRef.current = now;
+
+    if (!videoRef.current || !currentLecture) return;
+
+    const watchedDuration = Math.floor(videoRef.current.currentTime);
+    const status =
+      watchedDuration >= currentLecture.duration * 60
+        ? "completed"
+        : "in-progress";
+
+    try {
+      await axios.post(
+        "http://localhost:8000/api/v1/progress/update",
+        {
+          courseId,
+          lectureId: currentLecture._id,
+          status,
+          watchedDuration,
+        },
+        { withCredentials: true }
+      );
+      console.log("Progress updated:", status, watchedDuration);
+    } catch (err) {
+      console.error("Error updating progress:", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -57,7 +89,7 @@ const LecturePage = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col-reverse md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-80 bg-gray-900 p-6 overflow-y-auto">
+      <aside className="w-full md:w-80 bg-gray-900 pt-16 p-6 overflow-y-auto">
         <h2 className="text-xl font-semibold text-cyan-400 mb-6">Lectures</h2>
         {sections.map((section, idx) => (
           <div key={section._id} className="mb-6">
@@ -95,15 +127,17 @@ const LecturePage = () => {
           {currentLecture.title}
         </h1>
 
-        {/* Responsive Video Player */}
+        {/* Video Player */}
         {currentLecture.type === "video" && currentLecture.content ? (
           <div className="w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-xl mb-6">
             <video
+              ref={videoRef}
               key={currentLecture._id}
               controls
               autoPlay
               className="w-full h-full object-cover bg-black"
               src={currentLecture.content}
+              onTimeUpdate={handleProgressUpdate} // Throttled updates
             />
           </div>
         ) : (

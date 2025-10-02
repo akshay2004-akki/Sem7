@@ -1,7 +1,7 @@
 // utils/cloudinary.js
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
-import fs from "fs";
+import fs from "fs/promises"; // use promise-based fs
 
 dotenv.config();
 
@@ -12,22 +12,21 @@ cloudinary.config({
 });
 
 export const uploadOnCloudinary = async (filePath, folder = "") => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(
-      filePath,
-      {
-        folder,
-        resource_type: "auto",
-      },
-      (error, result) => {
-        // Clean up the local temp file
-        fs.unlink(filePath, (err) => {
-          if (err) console.error("Failed to delete temp file:", err);
-        });
-
-        if (error) return reject(error);
-        return resolve(result);
-      }
-    );
-  });
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder,
+      resource_type: "auto",
+    });
+    return result;
+  } catch (err) {
+    throw err;
+  } finally {
+    // Ensure the temp file is deleted whether upload succeeds or fails
+    try {
+      await fs.unlink(filePath);
+      console.log(`Temp file ${filePath} deleted`);
+    } catch (unlinkErr) {
+      console.error(`Failed to delete temp file ${filePath}:`, unlinkErr);
+    }
+  }
 };

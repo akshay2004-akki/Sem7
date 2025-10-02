@@ -7,7 +7,7 @@ import { User } from "../models/user.model.js";
 
 export const createCourse = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const { title, description, category, price, language } = req.body;
+  const { title, description, category, price, language, currency } = req.body;
   if (!userId || !isValidObjectId(userId)) {
     throw new ApiError(400, "Invalid user ID");
   }
@@ -32,6 +32,7 @@ export const createCourse = asyncHandler(async (req, res) => {
     category,
     thumbnail: uploadedImage.secure_url,
     price,
+    currency,
     language,
   });
   if (!newCourse) {
@@ -151,6 +152,8 @@ export const getInstructorCourses = asyncHandler(async (req, res) => {
       message: "No courses found for this instructor",
     });
   }
+  console.log(courses);
+  
   return res.status(200).json({
     courses,
     message: "Courses retrieved successfully",
