@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Plus, Pencil, Trash, X } from "lucide-react";
+import { Plus, Pencil, Trash, X, MoreVertical } from "lucide-react";
 import axios from "axios";
 
 function ManageCourse() {
@@ -21,6 +21,9 @@ function ManageCourse() {
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
 
+  // Track open dropdown (sectionId or lectureId)
+  const [openMenu, setOpenMenu] = useState(null);
+
   useEffect(() => {
     const fetchCourse = async () => {
       try {
@@ -39,7 +42,13 @@ function ManageCourse() {
   // ---------------- Add Lecture ----------------
   const handleAddLecture = (sectionId) => {
     setSelectedSection(sectionId);
-    setLectureData({ title: "", type: "text", duration: "", content: "", file: null });
+    setLectureData({
+      title: "",
+      type: "text",
+      duration: "",
+      content: "",
+      file: null,
+    });
     setShowLectureModal(true);
   };
 
@@ -85,10 +94,12 @@ function ManageCourse() {
   };
 
   const deleteLecture = async (lectureId) => {
-    await axios.delete(
+    const res = await axios.delete(
       `http://localhost:8000/api/v1/lectures/deleteLecture/${lectureId}`,
       { withCredentials: true }
     );
+    console.log(res.data);
+    
     setCourse((prev) => {
       const updatedSections = prev.sections.map((sec) => {
         return {
@@ -127,6 +138,32 @@ function ManageCourse() {
     }
   };
 
+  // ---------------- Close dropdown on outside click ----------------
+  const menuRef = useRef();
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSectionDelete = async(sectionId)=>{
+    try {
+      const res = await axios.delete(`http://localhost:8000/api/v1/sections/deleteSection/${sectionId}`, {withCredentials:true});
+      console.log(res.data);
+        setCourse((prev) => {
+            const updatedSections = prev.sections.filter((sec) => sec._id !== sectionId);
+            return { ...prev, sections: updatedSections };
+        });
+    } catch (error) {
+        console.log(error.message);
+        alert("Failed to delete section");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-zinc-900 text-white p-6">
       {/* Course Header */}
@@ -148,7 +185,7 @@ function ManageCourse() {
       </div>
 
       {/* Sections and Lectures */}
-      <div className="mt-8 space-y-6">
+      <div className="mt-8 space-y-6" ref={menuRef}>
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Course Sections</h2>
           <button
@@ -165,15 +202,33 @@ function ManageCourse() {
             className="bg-zinc-800 rounded-lg p-4 shadow space-y-4"
           >
             {/* Section Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center relative">
               <h3 className="text-lg font-semibold">{section.title}</h3>
-              <div className="flex gap-2">
-                <button className="p-2 bg-zinc-700 rounded hover:bg-zinc-600">
-                  <Pencil size={16} />
+
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setOpenMenu(
+                      openMenu === `section-${section._id}`
+                        ? null
+                        : `section-${section._id}`
+                    )
+                  }
+                  className="p-2 bg-zinc-700 rounded hover:bg-zinc-600"
+                >
+                  <MoreVertical size={16} />
                 </button>
-                <button className="p-2 bg-red-600 rounded hover:bg-red-500">
-                  <Trash size={16} />
-                </button>
+
+                {openMenu === `section-${section._id}` && (
+                  <div className="absolute right-0 mt-2 w-28 bg-zinc-800 border border-zinc-700 rounded shadow-lg z-10">
+                    <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-zinc-700 text-sm">
+                      <Pencil size={14} /> Edit
+                    </button>
+                    <button onClick={()=>handleSectionDelete(section._id)} className="flex items-center gap-2 w-full px-3 py-2 text-red-400 hover:bg-zinc-700 text-sm">
+                      <Trash size={14} /> Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -182,19 +237,37 @@ function ManageCourse() {
               {section.lectures.map((lecture) => (
                 <div
                   key={lecture._id}
-                  className="flex justify-between items-center bg-zinc-700 p-2 rounded"
+                  className="flex justify-between items-center bg-zinc-700 p-2 rounded relative"
                 >
                   <span>{lecture.title}</span>
-                  <div className="flex gap-2">
-                    <button className="p-1 bg-zinc-600 rounded hover:bg-zinc-500">
-                      <Pencil size={14} />
-                    </button>
+
+                  <div className="relative">
                     <button
-                      onClick={() => deleteLecture(lecture._id)}
-                      className="p-1 bg-red-500 rounded hover:bg-red-400"
+                      onClick={() =>
+                        setOpenMenu(
+                          openMenu === `lecture-${lecture._id}`
+                            ? null
+                            : `lecture-${lecture._id}`
+                        )
+                      }
+                      className="p-1 bg-zinc-600 rounded hover:bg-zinc-500"
                     >
-                      <Trash size={14} />
+                      <MoreVertical size={14} />
                     </button>
+
+                    {openMenu === `lecture-${lecture._id}` && (
+                      <div className="absolute right-0 mt-2 w-28 bg-zinc-800 border border-zinc-700 rounded shadow-lg z-10">
+                        <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-zinc-700 text-sm">
+                          <Pencil size={14} /> Edit
+                        </button>
+                        <button
+                          onClick={() => deleteLecture(lecture._id)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-red-400 hover:bg-zinc-700 text-sm"
+                        >
+                          <Trash size={14} /> Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

@@ -10,7 +10,9 @@ const LecturePage = () => {
   const [loading, setLoading] = useState(true);
 
   const videoRef = useRef(null);
-  const lastUpdateRef = useRef(0); // track last API call timestamp
+  const lastUpdateRef = useRef(0); // throttle by time
+  const lastStatusRef = useRef(null); // prevent duplicate status calls
+  const lastDurationRef = useRef(0); // prevent tiny increments
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -37,21 +39,23 @@ const LecturePage = () => {
     fetchCourse();
   }, [courseId, lectureId]);
 
-  // Function to send progress update
-  const handleProgressUpdate = async () => {
+  // ✅ Optimized progress update
+  const updateProgress = async (watchedDuration, status) => {
     const now = Date.now();
 
-    // Throttle updates: only once every 10 seconds
-    if (now - lastUpdateRef.current < 3000) return;
+    // Skip if status is unchanged (avoid duplicate "completed" or "in-progress")
+    if (status === lastStatusRef.current) return;
+
+    // Skip if watched increment < 5s (except when completed)
+    if (status !== "completed" && watchedDuration - lastDurationRef.current < 5) return;
+
+    // Skip if too frequent (<5s), unless "completed"
+    if (status !== "completed" && now - lastUpdateRef.current < 5000) return;
+
+    // update trackers
+    lastStatusRef.current = status;
+    lastDurationRef.current = watchedDuration;
     lastUpdateRef.current = now;
-
-    if (!videoRef.current || !currentLecture) return;
-
-    const watchedDuration = Math.floor(videoRef.current.currentTime);
-    const status =
-      watchedDuration >= currentLecture.duration * 60
-        ? "completed"
-        : "in-progress";
 
     try {
       await axios.post(
@@ -59,14 +63,14 @@ const LecturePage = () => {
         {
           courseId,
           lectureId: currentLecture._id,
+          watchedDuration: Math.floor(watchedDuration),
           status,
-          watchedDuration,
         },
         { withCredentials: true }
       );
-      console.log("Progress updated:", status, watchedDuration);
+      console.log("✅ Progress updated:", status, watchedDuration);
     } catch (err) {
-      console.error("Error updating progress:", err);
+      console.error("❌ Error updating progress:", err);
     }
   };
 
@@ -132,12 +136,24 @@ const LecturePage = () => {
           <div className="w-full max-w-4xl aspect-video rounded-lg overflow-hidden shadow-xl mb-6">
             <video
               ref={videoRef}
-              key={currentLecture._id}
               controls
               autoPlay
-              className="w-full h-full object-cover bg-black"
+              className="w-full h-full object-cover bg-black rounded-lg"
               src={currentLecture.content}
-              onTimeUpdate={handleProgressUpdate} // Throttled updates
+              onTimeUpdate={(e) => {
+                const current = e.target.currentTime;
+                const total = e.target.duration;
+                const status =
+                  current >= total - 2 ? "completed" : "in-progress";
+                updateProgress(current, status);
+              }}
+              onPause={(e) =>
+                updateProgress(e.target.currentTime, "in-progress")
+              }
+              onSeeked={(e) =>
+                updateProgress(e.target.currentTime, "in-progress")
+              }
+              onEnded={(e) => updateProgress(e.target.duration, "completed")}
             />
           </div>
         ) : (

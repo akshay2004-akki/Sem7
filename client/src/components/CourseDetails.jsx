@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { BookOpen, Clock, Users, PlayCircle } from "lucide-react";
+import { BookOpen, Clock, Users, PlayCircle, CheckCircle, ClockIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
+  const userId = localStorage.getItem("userId");
+
   const [details, setDetails] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [progress, setProgress] = useState(null);
 
   // Reviews state
   const [reviews, setReviews] = useState([]);
@@ -15,6 +18,9 @@ const CourseDetails = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [avg, setAvg] = useState(0);
+
+  // Description expand/collapse
+  const [expanded, setExpanded] = useState(false);
 
   // Fetch course details
   useEffect(() => {
@@ -31,6 +37,24 @@ const CourseDetails = () => {
     };
     fetchDetails();
   }, [courseId]);
+
+  // Fetch course progress
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (isEnrolled && userId) {
+        try {
+          const res = await axios.get(
+            `http://localhost:8000/api/v1/progress/${userId}/${courseId}`,
+            { withCredentials: true }
+          );
+          setProgress(res.data.progress);
+        } catch (error) {
+          console.log("Error fetching progress:", error.message);
+        }
+      }
+    };
+    fetchProgress();
+  }, [isEnrolled, userId, courseId]);
 
   // Fetch reviews (paginated)
   const fetchReviews = async (pageNum = 1) => {
@@ -99,7 +123,6 @@ const CourseDetails = () => {
       return;
     }
     try {
-      const userId = localStorage.getItem("userId");
       const res = await axios.post(
         `http://localhost:8000/api/v1/reviews/${courseId}/${userId}`,
         newReview,
@@ -107,7 +130,6 @@ const CourseDetails = () => {
       );
       alert(res.data.message);
 
-      // Refresh reviews after posting
       fetchReviews(1);
       setNewReview({ rating: 0, comment: "" });
     } catch (error) {
@@ -121,19 +143,21 @@ const CourseDetails = () => {
     window.open(url, "_blank");
   };
 
-  useEffect(()=>{
-    const averagerating = async()=>{
+  // Average rating
+  useEffect(() => {
+    const averagerating = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/v1/reviews/average/${courseId}`, {withCredentials:true});
+        const res = await axios.get(
+          `http://localhost:8000/api/v1/reviews/average/${courseId}`,
+          { withCredentials: true }
+        );
         setAvg(res.data.averageRating);
       } catch (error) {
         console.log(error.message);
-        
       }
-    }
-
+    };
     averagerating();
-  },[courseId])
+  }, [courseId]);
 
   if (!details) {
     return (
@@ -142,6 +166,33 @@ const CourseDetails = () => {
       </div>
     );
   }
+
+  const formattedDescription = details.description.replace(/\r\n/g, "<br/>");
+  const previewText =
+    formattedDescription.slice(0, 300) +
+    (details.description.length > 300 ? "..." : "");
+
+  // Function to get lecture status
+  const getLectureStatus = (lectureId) => {
+    if (!progress || !progress.completedLectures) return "not-started";
+    const lectureProgress = progress.completedLectures.find(
+      (l) => l.lectureId?._id === lectureId
+    );
+    if (!lectureProgress) return "not-started";
+    return lectureProgress.status; // 'completed', 'in-progress', etc.
+  };
+
+  // Render status badge
+  const renderStatusBadge = (status) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle className="w-4 h-4 text-green-400" title="Completed" />;
+      case "in-progress":
+        return <ClockIcon className="w-4 h-4 text-yellow-400" title="In Progress" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white px-6 md:px-12 py-12">
@@ -164,7 +215,24 @@ const CourseDetails = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-cyan-400">
             {details.title}
           </h1>
-          <p className="text-gray-400">{details.description}</p>
+
+          {/* Description with See More / See Less */}
+          <div className="text-gray-400">
+            <p
+              dangerouslySetInnerHTML={{
+                __html: expanded ? formattedDescription : previewText,
+              }}
+            ></p>
+            {details.description.length > 300 && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-cyan-400 hover:underline mt-2 inline-block"
+              >
+                {expanded ? "See Less" : "See More"}
+              </button>
+            )}
+          </div>
+
           <div className="flex flex-wrap gap-6 text-gray-300">
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-cyan-400" />
@@ -196,30 +264,34 @@ const CourseDetails = () => {
         <h2 className="text-2xl font-semibold mb-6">Course Content</h2>
         <div className="space-y-6">
           {details.sections?.map((section, i) => (
-            <div
-              key={section._id}
-              className="bg-black p-6 rounded-xl shadow-md"
-            >
+            <div key={section._id} className="bg-black p-6 rounded-xl shadow-md">
               <h3 className="text-lg font-semibold mb-4">
                 {i + 1}. {section.title}
               </h3>
               <div className="space-y-3">
-                {section.lectures?.map((lecture) => (
-                  <div
-                    key={lecture._id}
-                    className="flex items-center justify-between bg-black p-3 rounded-lg hover:bg-gray-700 transition"
-                  >
-                    <span>{lecture.title}</span>
-                    {isEnrolled && loggedIn && (
-                      <button
-                        onClick={() => openLecturePage(lecture)}
-                        className="px-3 py-1 text-sm bg-cyan-500 hover:bg-cyan-600 rounded-md flex items-center gap-1"
-                      >
-                        <PlayCircle className="w-4 h-4" /> Play
-                      </button>
-                    )}
-                  </div>
-                ))}
+                {section.lectures?.map((lecture) => {
+                  const status = getLectureStatus(lecture._id);
+                  return (
+                    <div
+                      key={lecture._id}
+                      className={`flex items-center justify-between bg-black p-3 rounded-lg hover:bg-gray-700 transition ${
+                        status === "completed" ? "opacity-70" : ""
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {lecture.title} {renderStatusBadge(status)}
+                      </span>
+                      {isEnrolled && loggedIn && (
+                        <button
+                          onClick={() => openLecturePage(lecture)}
+                          className="px-3 py-1 text-sm bg-cyan-500 hover:bg-cyan-600 rounded-md flex items-center gap-1"
+                        >
+                          <PlayCircle className="w-4 h-4" /> Play
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -228,15 +300,14 @@ const CourseDetails = () => {
 
       {/* Reviews Section */}
       <div className="max-w-6xl mx-auto mt-16">
-        <h2 className="text-2xl font-semibold mb-6">Course Reviews : <span className="text-[25px]">{avg}</span>/<span className="text-sm">5.0</span> </h2>
+        <h2 className="text-2xl font-semibold mb-6">
+          Course Reviews : <span className="text-[25px]">{avg}</span>/<span className="text-sm">5.0</span>
+        </h2>
 
         {/* Existing Reviews */}
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div
-              key={review._id}
-              className="bg-gray-900 p-4 rounded-lg shadow-md"
-            >
+            <div key={review._id} className="bg-gray-900 p-4 rounded-lg shadow-md">
               <p className="text-sm text-gray-400">
                 {review.userId?.fullName || "Anonymous"}
               </p>

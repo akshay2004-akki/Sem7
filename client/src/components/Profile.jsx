@@ -654,6 +654,31 @@ export default function UserProfile() {
                           placeholder="e.g. English"
                         />
                       </div>
+                      <div>
+                        <label
+                          htmlFor="currency"
+                          className="block text-sm font-medium text-gray-200 mb-2"
+                        >
+                          Currency
+                        </label>
+                        <select
+                          id="currency"
+                          name="currency"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Select Currency
+                          </option>
+                          <option value="USD">USD – US Dollar</option>
+                          <option value="EUR">EUR – Euro</option>
+                          <option value="INR">INR – Indian Rupee</option>
+                          <option value="GBP">GBP – British Pound</option>
+                          <option value="JPY">JPY – Japanese Yen</option>
+                          <option value="AUD">AUD – Australian Dollar</option>
+                          <option value="CAD">CAD – Canadian Dollar</option>
+                        </select>
+                      </div>
                       <div className="flex justify-end">
                         <button
                           type="submit"
