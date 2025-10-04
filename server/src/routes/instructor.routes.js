@@ -31,6 +31,6 @@ router.put('/update', verifyJWT, updateInstructorProfile);
 router.delete('/delete', verifyJWT, deleteInstructorProfile);
 
 // ✅ Get courses by instructor ID (public)
-router.get('/:instructorId/courses', getInstructorCourses);
+router.get('/courses/:instructorId', getInstructorCourses);
 
 export default router;

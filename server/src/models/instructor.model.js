@@ -7,7 +7,20 @@ const instructorSchema = new Schema({
     },
     bio:{
         type: String,
+        default: "",
     },
+    ratings : [{
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        rating: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5,
+        }
+        }],
     rating:{
         type: Number,
         default: 0,

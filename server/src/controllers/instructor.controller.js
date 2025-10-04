@@ -43,7 +43,7 @@ export const getInstructorProfile = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "Invalid user ID");
     }
 
-    const instructorProfile = await Instructor.findOne({instructorId: userId}).populate("instructorId","fullName email avatar");
+    const instructorProfile = await Instructor.findOne({instructorId: userId}).populate("instructorId");
 
     if(!instructorProfile){
         throw new ApiError(404, "Instructor profile not found");
@@ -62,7 +62,7 @@ export const getInstructorById = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "Invalid instructor ID");
     }
 
-    const instructorProfile = await Instructor.findOne({instructorId}).populate("instructorId","fullName email avatar");
+    const instructorProfile = await Instructor.findOne({instructorId}).populate("instructorId", "-password -refreshToken -role");
 
     if(!instructorProfile){
         throw new ApiError(404, "Instructor profile not found");
@@ -150,3 +150,39 @@ export const getInstructorCourses = asyncHandler(async(req,res)=>{
     });
 });
 
+
+export const rateInstructor = asyncHandler(async(req,res)=>{
+    const {instructorId} = req.params;
+    const {rating} = req.body;
+    const userId = req.user?._id;
+    if(!instructorId || !isValidObjectId(instructorId)){    
+        throw new ApiError(400, "Invalid instructor ID");
+    }
+    if(!userId || !isValidObjectId(userId)){
+        throw new ApiError(400, "Invalid user ID");
+    }
+    if(!rating || rating < 1 || rating > 5){
+        throw new ApiError(400, "Rating must be between 1 and 5");
+    }
+    const instructorProfile = await Instructor.findOne({instructorId});
+    if(!instructorProfile){
+        throw new ApiError(404, "Instructor profile not found");
+    }
+    
+    // Prevent multiple ratings by same user
+    const alreadyRated = instructorProfile.ratings.find(r => r.userId.toString() === userId.toString());
+    if(alreadyRated){
+        throw new ApiError(400, "You have already rated this instructor");
+    }
+    instructorProfile.ratings.push({userId, rating});
+    // Recalculate average rating
+    const totalRatings = instructorProfile.ratings.length;
+    const sumRatings = instructorProfile.ratings.reduce((acc, r) => acc + r.rating, 0);
+    instructorProfile.rating = sumRatings / totalRatings;   
+    await instructorProfile.save();
+
+    return res.status(200).json({
+        message: "Instructor rated successfully",
+        instructorProfile
+    });
+});

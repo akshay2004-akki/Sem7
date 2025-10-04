@@ -26,6 +26,7 @@ export default function UserProfile() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile nav
   const [thumbnail, setThumbnail] = useState(null);
   const [instructorCourses, setInstructorCorses] = useState([]);
+  const [bio, setBio] = useState("");
 
   const navigate = useNavigate();
 
@@ -233,6 +234,20 @@ export default function UserProfile() {
     } catch (err) {
       console.error("Course creation error:", err.response?.data || err);
       alert(err.response?.data?.message || "Failed to create course.");
+    }
+  };
+
+  const handleBioSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/instructor/create",
+        { bio },
+        { withCredentials: true }
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.error(err.message);
     }
   };
 
@@ -539,6 +554,37 @@ export default function UserProfile() {
                         </div>
                       </form>
                     </div>
+                    {user.role === "instructor" && (
+                      <div>
+                        <form onSubmit={handleBioSubmit} className="space-y-6">
+                          <div>
+                            <label
+                              htmlFor="bio"
+                              className="block text-sm font-medium text-gray-200 mb-2"
+                            >
+                              Bio
+                            </label>
+                            <textarea
+                              id="bio"
+                              name="bio"
+                              rows={4}
+                              value={user?.bio}
+                              onChange={(e) => setBio(e.target.value)}
+                              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-gray-200 resize-none"
+                              placeholder="Write a short bio about yourself..."
+                            ></textarea>
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              type="submit"
+                              className="bg-cyan-500 text-black font-semibold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-cyan-400"
+                            >
+                              <Save size={16} /> Save Changes
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
                   </div>
                 )}
 

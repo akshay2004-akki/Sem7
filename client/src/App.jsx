@@ -26,6 +26,7 @@ import SupportSection from './components/Support';
 import CourseDetails from './components/CourseDetails';
 import LecturePage from './components/LecturePage';
 import ManageCourse from './components/ManageCourse';
+import InstructorProfile from './components/InstructorProfile';
 
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
           <Route path='/courses/:courseId' element={<CourseDetails/>} />
           <Route path="/course/:courseId/lecture/:lectureId" element = {<LecturePage/>}/>
           <Route path="/course/manage/:courseId" element = {<ManageCourse/>}/>
+          <Route path="/instructor/:instructorId" element = {<InstructorProfile/>}/>
         </Routes>
         <Footer/>
        </Router>

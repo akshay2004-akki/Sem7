@@ -29,6 +29,7 @@ import wishlistRoutes from './routes/wishlist.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import progressRoutes from './routes/progress.routes.js';
 import reviewRoutes from './routes/review.routes.js';
+import followRoutes from './routes/follow.routes.js'
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/instructor', instructorRoutes); 
@@ -39,6 +40,7 @@ app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/transaction', transactionRoutes);
 app.use('/api/v1/progress', progressRoutes); 
 app.use('/api/v1/reviews', reviewRoutes);  
+app.use('/api/v1/follow', followRoutes);
 
 
 export default app; 
