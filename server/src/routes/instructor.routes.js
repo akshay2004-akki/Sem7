@@ -6,7 +6,9 @@ import {
   getAllInstructors,
   updateInstructorProfile,
   deleteInstructorProfile,
-  getInstructorCourses
+  getInstructorCourses,
+  rateInstructor,
+  hasRatedInstructor
 } from '../controllers/instructor.controller.js';
 import { verifyJWT } from '../middleware/auth.middleware.js';
 
@@ -14,6 +16,9 @@ const router = Router();
 
 // ✅ Create a new instructor profile (authenticated)
 router.post('/create', verifyJWT, createInstructorProfile);
+
+//Rate
+router.post('/rate/:instructorId', verifyJWT, rateInstructor);
 
 // ✅ Get current logged-in instructor's profile (authenticated)
 router.get('/me', verifyJWT, getInstructorProfile);
@@ -32,5 +37,8 @@ router.delete('/delete', verifyJWT, deleteInstructorProfile);
 
 // ✅ Get courses by instructor ID (public)
 router.get('/courses/:instructorId', getInstructorCourses);
+
+//has rated
+router.get('/hasRated/:instructorId/:userId', verifyJWT, hasRatedInstructor);
 
 export default router;

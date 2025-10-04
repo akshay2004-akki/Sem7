@@ -131,24 +131,42 @@ export const deleteInstructorProfile = asyncHandler(async(req,res)=>{
     });
 });
 
-export const getInstructorCourses = asyncHandler(async(req,res)=>{
-    const {instructorId} = req.params;
-    if(!instructorId || !isValidObjectId(instructorId)){    
-        throw new ApiError(400, "Invalid instructor ID");
-    }
+export const getInstructorCourses = asyncHandler(async (req, res) => {
+  const { instructorId } = req.params;
 
-    const courses = await Course.find({instructorId});
-    if(!courses || courses.length === 0){
-        return res.status(404).json({
-            message: "No courses found for this instructor"
-        });
-    }
+  if (!instructorId || !isValidObjectId(instructorId)) {
+    throw new ApiError(400, "Invalid instructor ID");
+  }
 
-    return res.status(200).json({
-        courses,
-        message: "Courses fetched successfully"
+  // Pagination parameters
+  let { page, limit } = req.query;
+  page = parseInt(page) || 1; // default page = 1
+  limit = parseInt(limit) || 10; // default limit = 10
+  const skip = (page - 1) * limit;
+
+  // Count total courses for this instructor
+  const totalCourses = await Course.countDocuments({ instructorId });
+
+  const courses = await Course.find({ instructorId })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 }); // optional: latest courses first
+
+  if (!courses || courses.length === 0) {
+    return res.status(404).json({
+      message: "No courses found for this instructor",
     });
+  }
+
+  return res.status(200).json({
+    courses,
+    currentPage: page,
+    totalPages: Math.ceil(totalCourses / limit),
+    totalCourses,
+    message: "Courses fetched successfully",
+  });
 });
+
 
 
 export const rateInstructor = asyncHandler(async(req,res)=>{
@@ -184,5 +202,40 @@ export const rateInstructor = asyncHandler(async(req,res)=>{
     return res.status(200).json({
         message: "Instructor rated successfully",
         instructorProfile
+    });
+});
+
+export const hasRatedInstructor = asyncHandler(async(req,res)=>{
+    const {instructorId, userId} = req.params;
+
+    if(!instructorId || !isValidObjectId(instructorId)){    
+        throw new ApiError(400, "Invalid instructor ID");
+    }
+    if(!userId || !isValidObjectId(userId)){
+        throw new ApiError(400, "Invalid user ID");
+    }
+
+    const instructorProfile = await Instructor.findOne({instructorId});
+    if(!instructorProfile){
+        throw new ApiError(404, "Instructor profile not found");
+    }
+
+    const alreadyRated = instructorProfile.ratings.find(r => r.userId.toString() === userId.toString());
+    return res.status(200).json({
+        hasRated: !!alreadyRated
+    });
+});
+
+export const getTopInstructors = asyncHandler(async(req,res)=>{
+    const topInstructors = await Instructor.find({})
+    .sort({rating: -1})
+    .limit(5)
+    .populate("instructorId", "-password -refreshToken -role");
+    if(!topInstructors || topInstructors.length === 0){
+        throw new ApiError(404, "No instructors found");
+    }
+    return res.status(200).json({
+        topInstructors,
+        message: "Top instructors fetched successfully"
     });
 });
