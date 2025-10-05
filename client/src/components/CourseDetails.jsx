@@ -3,6 +3,21 @@ import { BookOpen, Clock, Users, PlayCircle, CheckCircle, ClockIcon } from "luci
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
+// --- Function to dynamically load the Razorpay script ---
+const loadRazorpayScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
+
 const CourseDetails = () => {
   const { courseId } = useParams();
   const userId = localStorage.getItem("userId");
@@ -22,7 +37,7 @@ const CourseDetails = () => {
   // Description expand/collapse
   const [expanded, setExpanded] = useState(false);
 
-  // Fetch course details
+  // --- All your existing functions remain here ---
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -38,7 +53,6 @@ const CourseDetails = () => {
     fetchDetails();
   }, [courseId]);
 
-  // Fetch course progress
   useEffect(() => {
     const fetchProgress = async () => {
       if (isEnrolled && userId) {
@@ -56,7 +70,6 @@ const CourseDetails = () => {
     fetchProgress();
   }, [isEnrolled, userId, courseId]);
 
-  // Fetch reviews (paginated)
   const fetchReviews = async (pageNum = 1) => {
     try {
       const res = await axios.get(
@@ -75,48 +88,101 @@ const CourseDetails = () => {
     fetchReviews(page);
   }, [courseId, page]);
 
-  // Check login status
   useEffect(() => {
     const checkLoginStatus = localStorage.getItem("isLoggedIn") === "true";
     setLoggedIn(checkLoginStatus);
   }, []);
 
-  // Check if enrolled
   useEffect(() => {
     const checkEnrollment = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8000/api/v1/courses/isEnrolled/${courseId}`,
-          { withCredentials: true }
-        );
-        setIsEnrolled(res.data.isEnrolled);
-      } catch (error) {
-        console.log(error.message);
+      if (loggedIn) {
+        try {
+          const res = await axios.get(
+            `http://localhost:8000/api/v1/courses/isEnrolled/${courseId}`,
+            { withCredentials: true }
+          );
+          setIsEnrolled(res.data.isEnrolled);
+        } catch (error) {
+          console.log(error.message);
+        }
       }
     };
     checkEnrollment();
-  }, [courseId]);
+  }, [courseId, loggedIn]);
 
-  // Handle enrollment
+  // --- Razorpay Payment and Enrollment Handler ---
   const handleEnrollment = async () => {
     if (!loggedIn) {
       alert("Please log in to enroll in the course.");
       return;
     }
+
+    const scriptLoaded = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
+    if (!scriptLoaded) {
+      alert("Could not load payment gateway. Please check your connection and try again.");
+      return;
+    }
+
     try {
-      const res = await axios.put(
-        `http://localhost:8000/api/v1/courses/enroll/${courseId}`,
+      // 1. Create Order: Get order details from backend
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/payment/checkout/${courseId}`,
         {},
         { withCredentials: true }
       );
-      alert(res.data.message);
-      setIsEnrolled(true);
+      console.log(res.data);
+      
+      // ✨ FIX: Correctly destructure the nested response data from your API
+      const { order, key_id } = res.data;
+
+      // 2. Open Razorpay Checkout Modal
+      const options = {
+        key: key_id,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Your Learning Platform",
+        description: `Payment for ${details.title}`,
+        image: details.thumbnail,
+        order_id: order.id,
+        handler: async function (response) {
+          try {
+            // 3. Verify Payment
+            const verificationRes = await axios.post(
+              `http://localhost:8000/api/v1/payment/verification/${courseId}`,
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+              { withCredentials: true }
+            );
+
+            alert(verificationRes.data.message || "Enrollment successful!");
+            setIsEnrolled(true);
+
+          } catch (verificationError) {
+            console.error("Payment verification failed:", verificationError);
+            alert("Payment verification failed. If the amount was deducted, please contact support.");
+          }
+        },
+        prefill: {},
+        theme: {
+          color: "#0891b2",
+        },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+        alert(response.error.description);
+      });
+      rzp1.open();
+
     } catch (error) {
-      console.log(error.message);
+      console.error("Enrollment process failed:", error);
+      alert(error.response?.data?.message || "Could not initiate payment. Please try again.");
     }
   };
 
-  // Submit review
   const handleReviewSubmit = async () => {
     if (!loggedIn || !isEnrolled) {
       alert("You must be enrolled to leave a review.");
@@ -129,7 +195,6 @@ const CourseDetails = () => {
         { withCredentials: true }
       );
       alert(res.data.message);
-
       fetchReviews(1);
       setNewReview({ rating: 0, comment: "" });
     } catch (error) {
@@ -137,13 +202,11 @@ const CourseDetails = () => {
     }
   };
 
-  // Open lecture in new tab
   const openLecturePage = (lecture) => {
     const url = `/course/${courseId}/lecture/${lecture._id}`;
     window.open(url, "_blank");
   };
 
-  // Average rating
   useEffect(() => {
     const averagerating = async () => {
       try {
@@ -172,17 +235,15 @@ const CourseDetails = () => {
     formattedDescription.slice(0, 300) +
     (details.description.length > 300 ? "..." : "");
 
-  // Function to get lecture status
   const getLectureStatus = (lectureId) => {
     if (!progress || !progress.completedLectures) return "not-started";
     const lectureProgress = progress.completedLectures.find(
       (l) => l.lectureId?._id === lectureId
     );
     if (!lectureProgress) return "not-started";
-    return lectureProgress.status; // 'completed', 'in-progress', etc.
+    return lectureProgress.status;
   };
 
-  // Render status badge
   const renderStatusBadge = (status) => {
     switch (status) {
       case "completed":
@@ -371,3 +432,4 @@ const CourseDetails = () => {
 };
 
 export default CourseDetails;
+

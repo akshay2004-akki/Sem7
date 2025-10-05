@@ -2,12 +2,22 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv'
+import Razorpay from 'razorpay'; // Import Razorpay
 
 dotenv.config({
     path:"./.env"
 })
 
 const app = express()
+
+// Initialize Razorpay instance
+export const razorpayInstance = new Razorpay({
+    key_id: process.env.RAZOR_PAY_KEY_ID,
+    key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+});
+
+// Export the instance with the name 'Razorpay' to match your controller's import
+export { razorpayInstance as Razorpay };
 
 app.use(cors({
     origin : process.env.CORS_ORIGIN,
@@ -20,6 +30,7 @@ app.use(express.urlencoded({extended:true, limit:"500gb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+// --- Route Imports ---
 import userRoutes from './routes/user.routes.js';
 import instructorRoutes from './routes/instructor.routes.js';
 import courseRoutes from './routes/course.routes.js';
@@ -32,7 +43,9 @@ import reviewRoutes from './routes/review.routes.js';
 import followRoutes from './routes/follow.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
+import paymentRoutes from './routes/payment.routes.js'; // Import payment routes
 
+// --- Route Mounting ---
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/instructor', instructorRoutes); 
 app.use('/api/v1/courses',courseRoutes)
@@ -45,6 +58,7 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/follow', followRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
+app.use('/api/v1/payment', paymentRoutes); // Mount payment routes
 
 
-export default app; 
+export default app;
