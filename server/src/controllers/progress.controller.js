@@ -76,3 +76,45 @@ export const getCourseProgress = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getWeeklyStudyHours = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId || !isValidObjectId(userId)) {
+    throw new ApiError(400, "Invalid user ID");
+  }
+
+  // Fetch all progress of the user
+  const allProgress = await Progress.find({ userId });
+
+  // Initialize 7-day array (Sunday → Saturday)
+  const weeklyMinutes = Array(7).fill(0);
+
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  allProgress.forEach((progress) => {
+    progress.completedLectures.forEach((lecture) => {
+      const updatedAt = new Date(lecture.lastUpdated);
+      if (updatedAt >= startOfWeek && updatedAt <= endOfWeek) {
+        const dayIndex = updatedAt.getDay(); // 0 = Sunday, 6 = Saturday
+        weeklyMinutes[dayIndex] += lecture.watchedDuration / 60; // seconds → minutes
+      }
+    });
+  });
+
+  // Convert minutes to hours (1 decimal)
+  const weeklyHours = weeklyMinutes.map((m) => +(m / 60).toFixed(1));
+
+  res.status(200).json({
+    userId,
+    weeklyHours, // [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+    message: "Weekly study hours fetched successfully",
+  });
+});

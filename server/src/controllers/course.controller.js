@@ -173,18 +173,37 @@ export const getAllCourses = asyncHandler(async (req, res) => {
   });
 });
 
+
+
 export const browseCourses = asyncHandler(async (req, res) => { 
   try {
-    const { search } = req.query;
+    const { search = "" } = req.query;
 
+    // If search is empty, return all or empty array
+    if (!search.trim()) {
+      return res.status(200).json([]);
+    }
+
+    // ✅ Safely escape all regex special characters
+    const escapeRegex = (str) =>
+      str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const safeSearch = escapeRegex(search.trim());
+    const regex = new RegExp(safeSearch, "i"); // case-insensitive
+
+    // ✅ Search only in title
     const courses = await Course.find({
-      title: { $regex: search, $options: "i" },
+      title: { $regex: regex },
     });
+
     res.status(200).json(courses);
   } catch (err) {
+    console.error("Search error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 
 export const enrollInCourse = asyncHandler(async(req,res)=>{
   const {courseId} = req.params;

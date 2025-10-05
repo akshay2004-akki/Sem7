@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use client";
 import { useState, useRef, useEffect } from "react";
 import logo from "../assets/Flat Vector Logo with Vibrant Greens (1).png";
@@ -21,14 +20,20 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 👈 starts logged out
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const navigate = useNavigate();
+
+  // 🔍 Search-related states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const profileRef = useRef(null);
   const sidebarRef = useRef(null);
+  const searchTimeout = useRef(null);
+  const navigate = useNavigate();
 
   // Sidebar close on outside click
   useEffect(() => {
@@ -37,44 +42,66 @@ export default function Navbar() {
         setSidebarOpen(false);
       }
     };
-
-    if (isSidebarOpen) {
+    if (isSidebarOpen)
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    else document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSidebarOpen]);
 
-  // --- Handlers for login/logout state ---
-  const handleLogin = () => {
-    navigate("/login");
-  };
+  // Login check
+  useEffect(() => {
+    const loginStatus = localStorage.getItem("isLoggedIn");
+    setIsLoggedIn(loginStatus);
+  }, []);
+
+  // --- Logout handler ---
   const handleLogout = async () => {
     setIsLoggedIn(false);
     setProfileOpen(false);
-    const res = await axios.post('http://localhost:8000/api/v1/users/logout',{}, {withCredentials:true})
-    console.log(res.data);
-
-    localStorage.removeItem('isLoggedIn')
-    window.location.href='/'
-    window.location.reload();
-    
+    await axios.post(
+      "http://localhost:8000/api/v1/users/logout",
+      {},
+      { withCredentials: true }
+    );
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "/";
   };
 
-  // --- Effect to close profile dropdown on outside click ---
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
+  // --- Debounced Search Handler ---
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    clearTimeout(searchTimeout.current);
+
+    if (query.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    // Debounce API call by 500ms
+    searchTimeout.current = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        const res = await axios.get(
+          `http://localhost:8000/api/v1/courses/browseCourses?search=${query}`,
+          { withCredentials: true }
+        );
+        console.log(res.data);
+
+        setSearchResults(res.data || []);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setIsSearching(false);
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }, 500);
+  };
+
+  const handleResultClick = (courseId) => {
+    setSearchQuery("");
+    setSearchResults([]);
+    navigate(`/courses/${courseId}`);
+  };
 
   const tabs = [
     { title: "Home", icon: Home, link: "" },
@@ -83,12 +110,9 @@ export default function Navbar() {
     { title: "Notifications", icon: Bell, link: "notifications" },
     { title: "Support", icon: HelpCircle, link: "support" },
   ];
-  useEffect(()=>{
-    const loginStatus = localStorage.getItem('isLoggedIn');
-    setIsLoggedIn(loginStatus)
-  },[])
+
   return (
-    <header className="h-14 flex items-center backdrop-blur-[10px] bg-transparent justify-between px-3 dark:border-gray-700 fixed p-[40px] sm:p-[30px] w-full z-50">
+    <header className="h-14 flex items-center backdrop-blur-[10px] bg-transparent justify-between px-3 fixed p-[40px] sm:p-[30px] w-full z-50">
       {/* --- Left: Logo + Hamburger --- */}
       <div className="flex items-center gap-3">
         <button
@@ -100,21 +124,69 @@ export default function Navbar() {
         <img src={logo} alt="Logo" className="h-12 rounded" />
       </div>
 
-      {/* --- Center: Tabs + Search (Large Screens) --- */}
-      <div className="hidden lg:flex items-center justify-center gap-6">
+      {/* --- Center: Tabs + Search (Desktop) --- */}
+      <div className="hidden lg:flex items-center justify-center gap-6 relative">
         <ExpandedTabs tabs={tabs} />
-        {/* Search bar for large screens */}
-        <div className="relative">
+
+        {/* 🔍 Search Bar */}
+        <div className="relative w-64">
           <input
             type="text"
-            placeholder="Search..."
-            className="px-4 py-2 rounded-lg bg-white/90 text-gray-700 focus:outline-none w-64 shadow-md"
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="px-4 py-2 rounded-lg bg-white/90 text-gray-700 focus:outline-none w-full shadow-md"
           />
           <Search className="absolute right-3 top-2.5 text-gray-500 h-5 w-5" />
+
+          {/* 🔽 Search Results Dropdown */}
+          {searchQuery && (
+            <div className="absolute mt-3 bg-black/95 backdrop-blur-lg rounded-2xl shadow-2xl w-[28rem] max-h-[22rem] overflow-y-auto z-50 border border-cyan-500/40">
+              {isSearching ? (
+                <p className="p-4 text-cyan-400 text-base text-center">
+                  Searching...
+                </p>
+              ) : searchResults.length > 0 ? (
+                searchResults.map((course) => (
+                  <div
+                    key={course._id}
+                    onClick={() => handleResultClick(course._id)}
+                    className="flex items-center gap-4 p-4 cursor-pointer hover:bg-cyan-900/30 transition-all duration-200"
+                  >
+                    {/* Thumbnail */}
+                    <img
+                      src={
+                        course.thumbnail ||
+                        "https://via.placeholder.com/100x60?text=No+Image"
+                      }
+                      alt={course.title}
+                      className="h-[70px] w-[100px] object-cover rounded-lg border border-cyan-500/40 shadow-md"
+                    />
+
+                    {/* Course Details */}
+                    <div className="flex flex-col">
+                      <h3 className="text-cyan-400 font-semibold text-base leading-tight">
+                        {course.title}
+                      </h3>
+                      {course.instructor && (
+                        <p className="text-gray-400 text-sm mt-1">
+                          By {course.instructor.name || "Unknown Instructor"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="p-4 text-cyan-300 text-center text-base">
+                  No courses found
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* --- Right side with Search (mobile) + Profile / Login --- */}
+      {/* --- Right: Profile/Login --- */}
       <div ref={profileRef} className="relative flex items-center gap-3">
         {/* Mobile search toggle */}
         <button
@@ -126,17 +198,14 @@ export default function Navbar() {
 
         {isLoggedIn ? (
           <>
-            {/* Profile button */}
             <button
               onClick={() => setProfileOpen(!isProfileOpen)}
               className="bg-amber-300 rounded-full"
             >
               <User className="rounded-full h-[45px] w-[45px] p-2 text-gray-700" />
             </button>
-
-            {/* Dropdown */}
             {isProfileOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 animate-in fade-in zoom-in-95">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700">
                 <ul className="py-1">
                   <li>
                     <a
@@ -159,7 +228,6 @@ export default function Navbar() {
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-
                     >
                       <Lock size={16} /> Log Out
                     </button>
@@ -169,19 +237,16 @@ export default function Navbar() {
             )}
           </>
         ) : (
-          <>
-            {/* Log in Button */}
-            <button
-              onClick={handleLogin}
-              className="bg-amber-300 p-2 px-4 rounded-xl text-gray-700 font-medium hover:bg-amber-400 transition-all"
-            >
-              Log in
-            </button>
-          </>
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-amber-300 p-2 px-4 rounded-xl text-gray-700 font-medium hover:bg-amber-400 transition-all"
+          >
+            Log in
+          </button>
         )}
       </div>
 
-      {/* --- Mobile Search Bar (expands below navbar) --- */}
+      {/* --- Mobile Search (Below Navbar) --- */}
       <AnimatePresence>
         {showMobileSearch && (
           <motion.div
@@ -195,44 +260,34 @@ export default function Navbar() {
               <input
                 type="text"
                 placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none"
               />
               <Search className="absolute right-3 top-2.5 text-gray-500 h-5 w-5" />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* --- Sidebar for Mobile --- */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black z-40"
-              onClick={() => setSidebarOpen(false)}
-            />
-
-            {/* Sidebar */}
-            <motion.aside
-              ref={sidebarRef}
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-[40px] left-[40px] w-auto h-auto bg-black shadow-lg z-50 p-5 flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <button onClick={() => setSidebarOpen(false)}>
-                  <X className="h-6 w-6 text-red-500 hover:text-red-300 transition-all duration-100 dark:text-gray-200" />
-                </button>
+            {/* Mobile search results */}
+            {searchQuery && (
+              <div className="bg-white dark:bg-gray-900 mt-2 rounded-lg shadow-md">
+                {isSearching ? (
+                  <p className="p-3 text-gray-500 text-sm">Searching...</p>
+                ) : searchResults.length > 0 ? (
+                  searchResults.map((course) => (
+                    <div
+                      key={course._id}
+                      onClick={() => handleResultClick(course._id)}
+                      className="p-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                    >
+                      {course.title}
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-3 text-gray-500 text-sm">No courses found</p>
+                )}
               </div>
-              <ExpandedTabs tabs={tabs} className="flex-col gap-4" />
-            </motion.aside>
-          </>
+            )}
+          </motion.div>
         )}
       </AnimatePresence>
     </header>
