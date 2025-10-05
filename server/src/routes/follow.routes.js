@@ -5,6 +5,6 @@ import { verifyJWT } from '../middleware/auth.middleware.js';
 const router = express.Router();
 
 router.post('/followUnfollow/:followerId/:followingId', verifyJWT, followAndUnfollowUser);
-router.get('/followers/:followingId', verifyJWT, getUserFollowers);
+router.get('/followers/:followingId', getUserFollowers);
 
 export default router;

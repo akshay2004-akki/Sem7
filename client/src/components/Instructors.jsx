@@ -1,45 +1,8 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
-
-const instructorsData = [
-  {
-    id: 1,
-    name: "Sarah Dole",
-    expertise: "UX/UI Design",
-    rating: 4.9,
-    reviews: 124,
-    imageUrl:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    name: "John Brix",
-    expertise: "React & Frontend",
-    rating: 4.8,
-    reviews: 98,
-    imageUrl:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Eliza Beth",
-    expertise: "Data Science & Python",
-    rating: 4.9,
-    reviews: 212,
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    name: "Mike Wheeler",
-    expertise: "Cloud & DevOps",
-    rating: 4.7,
-    reviews: 76,
-    imageUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-  },
-];
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // --- INDIVIDUAL RATING STARS COMPONENT ---
 const StarRating = ({ rating }) => {
@@ -60,6 +23,11 @@ const StarRating = ({ rating }) => {
 };
 
 const InstructorCard = ({ instructor }) => {
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/instructor/${instructor.instructorId._id}`);
+  };
   return (
     <div
       className="
@@ -90,16 +58,18 @@ const InstructorCard = ({ instructor }) => {
       {/* Card content */}
       <div className="relative  z-10 flex flex-col items-center">
         <img
-          src={instructor.imageUrl}
-          alt={`Profile of ${instructor.name}`}
+          src={instructor.instructorId.avatar}
+          alt={`Profile of ${instructor.instructorId.fullName}`}
           className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-700 shadow-lg"
         />
-        <h3 className="mt-6 text-xl font-bold text-white">{instructor.name}</h3>
+        <h3 className="mt-6 text-xl font-bold text-white">
+          {instructor.instructorId.fullName}
+        </h3>
         <div className="flex items-center justify-center mt-2 gap-2">
           <StarRating rating={instructor.rating} />
-          <span className="text-sm text-gray-400">({instructor.reviews})</span>
+          {/* <span className="text-sm text-gray-400">({instructor.reviews})</span> */}
         </div>
-        <p className="mt-2 text-base text-cyan-400">{instructor.expertise}</p>
+        {/* <p className="mt-2 text-base text-cyan-400">{instructor.expertise}</p> */}
 
         {/* Gradient button inside */}
         <a
@@ -126,7 +96,9 @@ const InstructorCard = ({ instructor }) => {
             <span className="block w-full h-full bg-black rounded-lg"></span>
           </span>
 
-          <span className="relative z-10">View Courses</span>
+          <span onClick={handleNavigate} className="relative z-10">
+            View Courses
+          </span>
         </a>
       </div>
     </div>
@@ -134,12 +106,32 @@ const InstructorCard = ({ instructor }) => {
 };
 
 const Instructors = () => {
+  const [instructorsData, setInstructorsData] = useState([]);
+
+  useEffect(() => {
+    const fetchTopInstructors = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/v1/instructor/top`,
+          { withCredentials: true }
+        );
+        console.log("Fetched top instructors:", res.data);
+        // ✅ Correct key name from backend
+        setInstructorsData(res.data.topInstructors);
+      } catch (error) {
+        console.error("Error fetching top instructors:", error.message);
+      }
+    };
+    fetchTopInstructors();
+  }, []);
+
   return (
     <section className="relative bg-gradient-to-b from-black via-[#0f1115] to-black py-20 sm:py-24 overflow-hidden">
       {/* Decorative Blur */}
       <div className="absolute sm:-top-72 top-[-9rem] left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/30 rounded-full filter blur-3xl opacity-60"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
         <div className="text-center">
           <ScrollReveal
             baseOpacity={0}
@@ -157,11 +149,19 @@ const Instructors = () => {
           </ScrollReveal>
         </div>
 
-        {/* Responsive Grid for Instructors */}
+        {/* Instructors Grid */}
         <div className="mt-16 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {instructorsData.map((instructor) => (
-            <InstructorCard key={instructor.id} instructor={instructor} />
-          ))}
+          {instructorsData.length > 0 ? (
+            instructorsData
+              .slice(0, 5)
+              .map((instructor) => (
+                <InstructorCard key={instructor._id} instructor={instructor} />
+              ))
+          ) : (
+            <p className="col-span-full text-center text-gray-400">
+              No instructors found.
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -8,37 +8,26 @@ import {
   deleteInstructorProfile,
   getInstructorCourses,
   rateInstructor,
-  hasRatedInstructor
+  hasRatedInstructor,
+  getTopInstructors
 } from '../controllers/instructor.controller.js';
 import { verifyJWT } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// ✅ Create a new instructor profile (authenticated)
+/* -------------------- ✅ AUTHENTICATED ROUTES -------------------- */
 router.post('/create', verifyJWT, createInstructorProfile);
-
-//Rate
-router.post('/rate/:instructorId', verifyJWT, rateInstructor);
-
-// ✅ Get current logged-in instructor's profile (authenticated)
-router.get('/me', verifyJWT, getInstructorProfile);
-
-// ✅ Get instructor profile by ID (public)
-router.get('/:instructorId', getInstructorById);
-
-// ✅ Get all instructors (public)
-router.get('/', getAllInstructors);
-
-// ✅ Update instructor profile (authenticated)
 router.put('/update', verifyJWT, updateInstructorProfile);
-
-// ✅ Delete instructor profile (authenticated)
 router.delete('/delete', verifyJWT, deleteInstructorProfile);
-
-// ✅ Get courses by instructor ID (public)
-router.get('/courses/:instructorId', getInstructorCourses);
-
-//has rated
+router.get('/profile/me', verifyJWT, getInstructorProfile);
+router.post('/rate/:instructorId', verifyJWT, rateInstructor);
 router.get('/hasRated/:instructorId/:userId', verifyJWT, hasRatedInstructor);
+
+/* -------------------- ✅ PUBLIC ROUTES -------------------- */
+// ⚠️ Order is important — always place specific routes before generic `/:id`
+router.get('/top', getTopInstructors);
+router.get('/courses/:instructorId', getInstructorCourses);
+router.get('/', getAllInstructors);
+router.get('/:instructorId', getInstructorById);
 
 export default router;

@@ -56,12 +56,14 @@ export const getInstructorProfile = asyncHandler(async(req,res)=>{
 });
 
 export const getInstructorById = asyncHandler(async(req,res)=>{
-    const {instructorId} = req.params;
+    try {
+        const {instructorId} = req.params;
+    console.log('✅ Reached the PUBLIC getInstructorById controller!');
 
     if(!instructorId || !isValidObjectId(instructorId)){
         throw new ApiError(400, "Invalid instructor ID");
     }
-
+    
     const instructorProfile = await Instructor.findOne({instructorId}).populate("instructorId", "-password -refreshToken -role");
 
     if(!instructorProfile){
@@ -72,6 +74,10 @@ export const getInstructorById = asyncHandler(async(req,res)=>{
         instructorProfile,
         message: "Instructor profile fetched successfully"
     });
+    } catch (error) {
+        console.log(error.message);
+        
+    }
 });
 
 export const getAllInstructors = asyncHandler(async(req,res)=>{

@@ -8,7 +8,7 @@ dotenv.config();
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
-    console.log("Cookies:", req.cookies);
+    console.log(`⛔️ Running verifyJWT middleware for URL: ${req.originalUrl}`);
 
     // Priority: cookies -> Authorization header
     const token =

@@ -36,6 +36,8 @@ const InstructorProfile = () => {
           `http://localhost:8000/api/v1/follow/followers/${instructorId}`,
           { withCredentials: true }
         );
+        console.log(followersRes.data);
+
         setFollowersCount(followersRes.data.followersCount);
 
         if (currentUserId) {
@@ -67,11 +69,14 @@ const InstructorProfile = () => {
             { withCredentials: true }
           );
           console.log(rateCheck.data);
-          
+
           setHasRated(rateCheck.data.hasRated);
         }
       } catch (err) {
-        console.error("Error fetching instructor profile:", err.response || err);
+        console.error(
+          "Error fetching instructor profile:",
+          err.response || err
+        );
       } finally {
         setLoading(false);
       }
@@ -167,13 +172,16 @@ const InstructorProfile = () => {
             </div>
 
             {/* Followers and Follow Button */}
-            {isLoggedIn &&
-              currentUserId.toString() !==
-                instructor.instructorId._id?.toString() && (
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="flex items-center gap-2 bg-cyan-600 px-3 py-1 rounded-lg">
-                    <User className="w-5 h-5" /> {followersCount} Followers
-                  </div>
+            <div className="mt-4 flex items-center gap-4">
+              {/* Followers count - always visible */}
+              <div className="flex items-center gap-2 bg-cyan-600 px-3 py-1 rounded-lg">
+                <User className="w-5 h-5" /> {followersCount} Followers
+              </div>
+
+              {/* Follow button - only if logged in and not the instructor */}
+              {isLoggedIn &&
+                currentUserId.toString() !==
+                  instructor.instructorId._id?.toString() && (
                   <button
                     onClick={handleFollowToggle}
                     className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
@@ -184,8 +192,8 @@ const InstructorProfile = () => {
                   >
                     {isFollowing ? "Following" : "Follow"}
                   </button>
-                </div>
-              )}
+                )}
+            </div>
 
             {/* ⭐ Rating Section */}
             {isLoggedIn &&
@@ -201,9 +209,7 @@ const InstructorProfile = () => {
                         key={star}
                         onMouseEnter={() => !hasRated && setHoverRating(star)}
                         onMouseLeave={() => !hasRated && setHoverRating(0)}
-                        onClick={() =>
-                          !hasRated && handleRatingSubmit(star)
-                        }
+                        onClick={() => !hasRated && handleRatingSubmit(star)}
                         className={`w-7 h-7 cursor-pointer transition-colors ${
                           (hoverRating || userRating || instructor.rating) >=
                           star
