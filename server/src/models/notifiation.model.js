@@ -4,7 +4,8 @@ const notificationSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        index : true
     },
     message: {
         type: String,

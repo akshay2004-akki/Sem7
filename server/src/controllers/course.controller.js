@@ -4,6 +4,8 @@ import { Course } from "../models/courses.model.js";
 import { isValidObjectId } from "mongoose";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
+import { sendNotification } from "./notification.controller.js";
+import { Follow } from "../models/follow.model.js";
 
 export const createCourse = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
@@ -38,6 +40,8 @@ export const createCourse = asyncHandler(async (req, res) => {
   if (!newCourse) {
     throw new ApiError(500, "Failed to create course");
   }
+  const followers = await Follow.find({ following: userId }).distinct('follower');
+  await sendNotification(followers, `New course "${newCourse.title}" by ${req.user.fullName}`, `/courses/${newCourse._id}`);
   return res.status(201).json({
     newCourse,
     message: "Course created successfully",

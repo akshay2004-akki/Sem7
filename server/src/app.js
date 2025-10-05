@@ -31,6 +31,7 @@ import progressRoutes from './routes/progress.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import followRoutes from './routes/follow.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/instructor', instructorRoutes); 
@@ -43,6 +44,7 @@ app.use('/api/v1/progress', progressRoutes);
 app.use('/api/v1/reviews', reviewRoutes);  
 app.use('/api/v1/follow', followRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/notifications', notificationsRoutes);
 
 
 export default app; 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, Briefcase } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // A simple SVG for Google's icon
 const GoogleIcon = () => (
@@ -18,7 +19,8 @@ export default function SignUpSection() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('STUDENT'); // Added role state, defaulting to STUDENT
+  const [role, setRole] = useState('student'); // Added role state, defaulting to STUDENT
+  const route = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +37,12 @@ export default function SignUpSection() {
         role
       }, {withCredentials: true});
 
-      console.log(res.data);
+      alert(res.data.message);
+      setFullName('');
+      setEmail('');
+      setPassword('');
+      setRole('student'); // Reset role to default after submission
+      route("/login")
       
 
     } catch (error) {
