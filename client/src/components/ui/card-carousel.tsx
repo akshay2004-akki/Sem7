@@ -99,7 +99,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
               >
                 {courses.map((course) => (
                   <SwiperSlide key={course._id}>
-                    <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-5 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40">
+                    <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-5 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center justify-end text-left transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40">
                       {/* Thumbnail */}
                       <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-cyan-400 shadow-md mb-4">
                         <img
@@ -121,6 +121,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                       <p className="text-gray-300 text-sm sm:text-base line-clamp-3">
                         {course.description}
                       </p>
+                      <p className="text-cyan-400 text-sm sm:text-base line-clamp-3">By : {course.instructorId.fullName}</p>
 
                       {/* Separator */}
                       <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full my-3"></div>

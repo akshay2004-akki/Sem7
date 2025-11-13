@@ -165,7 +165,7 @@ export const getInstructorCourses = asyncHandler(async (req, res) => {
 });
 
 export const getAllCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find();
+  const courses = await Course.find().populate("instructorId", "fullName");
   if (!courses || courses.length === 0) {
     return res.status(404).json({
       message: "No courses found",

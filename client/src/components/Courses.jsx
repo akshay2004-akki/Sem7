@@ -21,7 +21,7 @@ function Courses() {
         console.log(res.data);
         setCourses(res.data.courses)
       } catch (error) {
-        console.log(error.message);
+        console.log(error.message); 
         
       }
     }

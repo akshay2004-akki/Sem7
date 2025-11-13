@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // A simple SVG for Google's icon
@@ -18,6 +18,8 @@ export default function LoginSection() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const route = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ export default function LoginSection() {
 
         alert('Login successful!');
         // Redirect to the home page after successful login
-        window.location.href = '/'; 
+        route('/');
       } else {
         alert(res.data.message || 'Invalid credentials. Please try again.');
       }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BookOpen, Clock, Users, PlayCircle, CheckCircle, ClockIcon } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 // --- Function to dynamically load the Razorpay script ---
@@ -110,10 +110,12 @@ const CourseDetails = () => {
     checkEnrollment();
   }, [courseId, loggedIn]);
 
+  const route = useNavigate();
+
   // --- Razorpay Payment and Enrollment Handler ---
   const handleEnrollment = async () => {
     if (!loggedIn) {
-      alert("Please log in to enroll in the course.");
+      route("/login");
       return;
     }
 

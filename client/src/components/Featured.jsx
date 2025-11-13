@@ -1,30 +1,28 @@
 import React from "react";
 import { CardCarousel } from "@/components/ui/card-carousel";
 import ScrollReveal from "./ScrollReveal";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-// Example course data
-const courses = [
-  {
-    id: 1,
-    title: "Web Development Bootcamp",
-    description: "Learn HTML, CSS, JavaScript, and React from scratch.",
-    thumbnail: "/assets/logo.png",
-  },
-  {
-    id: 2,
-    title: "Data Structures & Algorithms",
-    description: "Master problem-solving and coding interview preparation.",
-    thumbnail: "./assets/herologo.png",
-  },
-  {
-    id: 3,
-    title: "Machine Learning Essentials",
-    description: "Build ML models and understand core AI concepts.",
-    thumbnail: "/assets/student.png",
-  },
-];
+
 
 function Featured() {
+  const [courses, setCourses] = useState([])
+
+  useEffect(()=>{
+    const fetchCourses = async()=>{
+      try {
+        const  res = await axios.get("http://localhost:8000/api/v1/courses/getAllCourses", {withCredentials:true});
+        console.log(res.data);
+        setCourses(res.data.courses)
+      } catch (error) {
+        console.log(error.message); 
+        
+      }
+    }
+
+    fetchCourses();
+  },[])
   return (
     <div className="w-full min-h-[100vh] bg-black text-white flex flex-col items-center py-20 px-5 relative overflow-hidden">
       {/* Background blob glow - centered */}
