@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BookOpen, Clock, Users, PlayCircle, CheckCircle, ClockIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { useApi } from "../context/ApiContext";
 
 // --- Function to dynamically load the Razorpay script ---
 const loadRazorpayScript = (src) => {
@@ -37,55 +38,30 @@ const CourseDetails = () => {
   // Description expand/collapse
   const [expanded, setExpanded] = useState(false);
 
-  // --- All your existing functions remain here ---
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8000/api/v1/courses/getCourseById/${courseId}`,
-          { withCredentials: true }
-        );
-        setDetails(res.data.course);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    fetchDetails();
-  }, [courseId]);
+  const {api} = useApi();
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      if (isEnrolled && userId) {
-        try {
-          const res = await axios.get(
-            `http://localhost:8000/api/v1/progress/${userId}/${courseId}`,
-            { withCredentials: true }
-          );
-          setProgress(res.data.progress);
-        } catch (error) {
-          console.log("Error fetching progress:", error.message);
-        }
-      }
-    };
-    fetchProgress();
-  }, [isEnrolled, userId, courseId]);
+  //course details fetch
+  useEffect(()=>{
+    api.course.getById(courseId).then((res)=>{
+      setDetails(res.course)
+      
+    })
+  },[courseId])
 
-  const fetchReviews = async (pageNum = 1) => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/v1/reviews/${courseId}?page=${pageNum}&limit=2`,
-        { withCredentials: true }
-      );
-      setReviews(res.data.reviews);
-      setPage(res.data.page);
-      setTotalPages(res.data.totalPages);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
+
+  //fetch progress
+  useEffect(()=>{
+    api.progress.get(userId, courseId).then(res=>setProgress(res.progress))
+  },[isEnrolled, userId, courseId])
+
+
+  //fetch reviews
   useEffect(() => {
-    fetchReviews(page);
+    api.review.getByCourse(courseId).then((res)=>{
+      setReviews(res.reviews);
+      setPage(res.page)
+      setTotalPages(res.totalPages)})
   }, [courseId, page]);
 
   useEffect(() => {
@@ -93,22 +69,13 @@ const CourseDetails = () => {
     setLoggedIn(checkLoginStatus);
   }, []);
 
-  useEffect(() => {
-    const checkEnrollment = async () => {
-      if (loggedIn) {
-        try {
-          const res = await axios.get(
-            `http://localhost:8000/api/v1/courses/isEnrolled/${courseId}`,
-            { withCredentials: true }
-          );
-          setIsEnrolled(res.data.isEnrolled);
-        } catch (error) {
-          console.log(error.message);
-        }
-      }
-    };
-    checkEnrollment();
-  }, [courseId, loggedIn]);
+
+  //check enrollment
+  useEffect(()=>{
+    if(loggedIn){
+      api.course.isEnrolled(courseId).then((res)=>{setIsEnrolled(res.isEnrolled)})
+    }
+  },[courseId, loggedIn])
 
   const route = useNavigate();
 
@@ -126,16 +93,13 @@ const CourseDetails = () => {
     }
 
     try {
-      // 1. Create Order: Get order details from backend
-      const res = await axios.post(
-        `http://localhost:8000/api/v1/payment/checkout/${courseId}`,
-        {},
-        { withCredentials: true }
-      );
-      console.log(res.data);
+      // 1. Create Order on Backend
+      const res = await api.payment.checkout(courseId)
+      console.log(res);
+      
       
       // ✨ FIX: Correctly destructure the nested response data from your API
-      const { order, key_id } = res.data;
+      const { order, key_id } = res;
 
       // 2. Open Razorpay Checkout Modal
       const options = {
@@ -148,18 +112,14 @@ const CourseDetails = () => {
         order_id: order.id,
         handler: async function (response) {
           try {
-            // 3. Verify Payment
-            const verificationRes = await axios.post(
-              `http://localhost:8000/api/v1/payment/verification/${courseId}`,
-              {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              },
-              { withCredentials: true }
-            );
+            // 3. Verify Payment: Send payment details to backend for verification
+            const verificationRes = await api.payment.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }, courseId);
 
-            alert(verificationRes.data.message || "Enrollment successful!");
+            alert(verificationRes.message || "Enrollment successful!");
             setIsEnrolled(true);
 
           } catch (verificationError) {
@@ -209,20 +169,10 @@ const CourseDetails = () => {
     window.open(url, "_blank");
   };
 
-  useEffect(() => {
-    const averagerating = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8000/api/v1/reviews/average/${courseId}`,
-          { withCredentials: true }
-        );
-        setAvg(res.data.averageRating);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    averagerating();
-  }, [courseId]);
+  // --- Fetch reviews for a specific page ---
+  useEffect(()=>{
+    api.review.avgRating(courseId).then((res)=>setAvg(res.averageRating))
+  },[courseId])
 
   if (!details) {
     return (

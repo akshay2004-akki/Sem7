@@ -1,36 +1,28 @@
 import React from "react";
 import SplitText from "./SplitText";
-import {CardCarousel} from "@/components/ui/card-carousel"; // Import your carousel
+import { CardCarousel } from "@/components/ui/card-carousel"; // Import your carousel
 import { useEffect } from "react";
-import axios from "axios";
 import { useState } from "react";
+import { useApi } from "../context/ApiContext";
 
 function Courses() {
-
-  const [courses, setCourses] = useState([])
+  const [courses, setCourses] = useState([]);
   const handleNavigate = (courseId) => {
     // Later you can replace this with react-router navigate(`/courses/${courseId}`)
     console.log(`Navigate to course with ID: ${courseId}`);
     window.location.href = `/courses/${courseId}`; // Simple redirect for now
   };
 
-  useEffect(()=>{
-    const fetchCourses = async()=>{
-      try {
-        const  res = await axios.get("http://localhost:8000/api/v1/courses/getAllCourses", {withCredentials:true});
-        console.log(res.data);
-        setCourses(res.data.courses)
-      } catch (error) {
-        console.log(error.message); 
-        
-      }
-    }
+ 
 
+  const { api } = useApi();
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const res = await api.course.getAll();
+      setCourses(res.courses);
+    };
     fetchCourses();
-  },[])
-
-
-
+  }, []);
 
   // Group courses by category
   const coursesByCategory = courses.reduce((acc, course) => {
@@ -71,7 +63,9 @@ function Courses() {
           <div className="mt-12 space-y-12 w-full">
             {Object.keys(coursesByCategory).map((category) => (
               <div key={category}>
-                <h2 className="text-xl font-semibold text-white mb-4">{category}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {category}
+                </h2>
                 <CardCarousel
                   courses={coursesByCategory[category]}
                   autoplayDelay={3000}

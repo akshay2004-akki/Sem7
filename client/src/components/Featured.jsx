@@ -2,27 +2,25 @@ import React from "react";
 import { CardCarousel } from "@/components/ui/card-carousel";
 import ScrollReveal from "./ScrollReveal";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useApi } from "../context/ApiContext";
+import { useNavigate } from "react-router-dom";
 
 
 
 function Featured() {
   const [courses, setCourses] = useState([])
 
+  const {api} = useApi();
+
   useEffect(()=>{
     const fetchCourses = async()=>{
-      try {
-        const  res = await axios.get("http://localhost:8000/api/v1/courses/getAllCourses", {withCredentials:true});
-        console.log(res.data);
-        setCourses(res.data.courses)
-      } catch (error) {
-        console.log(error.message); 
-        
-      }
+      const res = await api.course.getAll();
+      setCourses(res.courses);
     }
-
-    fetchCourses();
+    fetchCourses()
   },[])
+  const route = useNavigate()
+
   return (
     <div className="w-full min-h-[100vh] bg-black text-white flex flex-col items-center py-20 px-5 relative overflow-hidden">
       {/* Background blob glow - centered */}
@@ -76,6 +74,7 @@ function Featured() {
             autoplayDelay={3000}
             showPagination={true}
             showNavigation={true}
+            onNavigate={(courseId) => route(`/courses/${courseId}`)}
           />
         </div>
       </div>

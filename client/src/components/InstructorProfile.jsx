@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BookOpen, User, Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useApi } from "../context/ApiContext";
 
 const InstructorProfile = () => {
   const { instructorId } = useParams();
@@ -20,70 +21,105 @@ const InstructorProfile = () => {
   const currentUserId = localStorage.getItem("userId");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
+  const {api} = useApi()
+
   // Fetch instructor profile, followers, and courses
-  useEffect(() => {
-    const fetchInstructorProfile = async () => {
-      try {
-        // 1️⃣ Fetch instructor profile
-        const res = await axios.get(
-          `http://localhost:8000/api/v1/instructor/${instructorId}`,
-          { withCredentials: true }
-        );
-        setInstructor(res.data.instructorProfile);
+  // =============================
+// 1️⃣ Fetch Instructor Profile
+// =============================
+useEffect(() => {
+  const loadInstructor = async () => {
+    try {
+      const data = await api.instructor.getProfile(instructorId);
+      console.log(data); 
+      
+      setInstructor(data.instructorProfile);
+    } catch (err) {
+      console.error("Error loading instructor profile:", err);
+    }
+  };
 
-        // 2️⃣ Fetch followers
-        const followersRes = await axios.get(
-          `http://localhost:8000/api/v1/follow/followers/${instructorId}`,
-          { withCredentials: true }
-        );
-        console.log(followersRes.data);
+  loadInstructor();
+}, [instructorId]);
 
-        setFollowersCount(followersRes.data.followersCount);
 
-        if (currentUserId) {
-          const followerIds = followersRes.data.followers.map((f) =>
-            f.follower.toString()
-          );
-          setIsFollowing(followerIds.includes(currentUserId));
-        }
+// =============================
+// 2️⃣ Fetch Followers
+// =============================
+useEffect(() => {
+  const loadFollowers = async () => {
+    try {
+      const data = await api.follow.followers(instructorId);
+      console.log(data); 
+      
+      setFollowersCount(data.followersCount);
 
-        // 3️⃣ Fetch paginated courses
-        const coursesRes = await axios.get(
-          `http://localhost:8000/api/v1/instructor/courses/${instructorId}?page=${page}&limit=3`,
-          { withCredentials: true }
-        );
-
-        if (coursesRes.data.courses) {
-          setInstructor((prev) => ({
-            ...prev,
-            courses: coursesRes.data.courses,
-          }));
-          setTotalPages(coursesRes.data.totalPages);
-          setTotalCourses(coursesRes.data.totalCourses);
-        }
-
-        // 4️⃣ Check if current user has rated this instructor
-        if (currentUserId) {
-          const rateCheck = await axios.get(
-            `http://localhost:8000/api/v1/instructor/hasRated/${instructorId}/${currentUserId}`,
-            { withCredentials: true }
-          );
-          console.log(rateCheck.data);
-
-          setHasRated(rateCheck.data.hasRated);
-        }
-      } catch (err) {
-        console.error(
-          "Error fetching instructor profile:",
-          err.response || err
-        );
-      } finally {
-        setLoading(false);
+      if (currentUserId) {
+        const ids = data.followers.map((f) => f.follower.toString());
+        setIsFollowing(ids.includes(currentUserId)); 
       }
-    };
+    } catch (err) {
+      console.error("Error loading followers:", err);
+    }
+  };
 
-    fetchInstructorProfile();
-  }, [instructorId, currentUserId, page]);
+  loadFollowers();
+}, [instructorId, currentUserId]);
+
+
+// =============================
+// 3️⃣ Fetch Instructor Courses
+// =============================
+useEffect(() => {
+  const loadCourses = async () => {
+    try {
+      const data = await api.instructor.getCourses(instructorId, page);
+      console.log(data);
+      
+
+      setInstructor((prev) =>
+        prev ? { ...prev, courses: data.courses } : null
+      );
+
+      setTotalCourses(data.totalCourses);
+      setTotalPages(data.totalPages); // backend does not support pagination here
+    } catch (err) {
+      console.error("Error loading courses:", err);
+    }
+  };
+
+  loadCourses();
+}, [instructorId, page]);
+
+
+// =============================
+// 4️⃣ Check If User Already Rated
+// =============================
+useEffect(() => {
+  if (!currentUserId) return;
+
+  const checkRating = async () => {
+    try {
+      const res = await api.instructor.hasRated(instructorId, currentUserId);
+      setHasRated(res.hasRated);
+    } catch (err) {
+      console.error("Error checking rating:", err);
+    }
+  };
+
+  checkRating();
+}, [instructorId, currentUserId]);
+
+
+// =============================
+// 5️⃣ Stop global loading when everything fetched
+// =============================
+useEffect(() => {
+  if (instructor !== null) {
+    setLoading(false);
+  }
+}, [instructor]);
+
 
   const handleFollowToggle = async () => {
     if (!currentUserId) {
@@ -149,8 +185,8 @@ const InstructorProfile = () => {
           {/* Profile Image */}
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-cyan-500 shadow-md">
             <img
-              src={instructor.instructorId.avatar || "/default-avatar.png"}
-              alt={instructor.instructorId.fullName}
+              src={instructor?.instructorId.avatar || "/default-avatar.png"}
+              alt={instructor?.instructorId.fullName}
               className="w-full h-full object-cover"
             />
           </div>

@@ -1,33 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useApi } from "../context/ApiContext";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate()
+  const {api} = useApi();
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        // Replace with the logged-in user's ID
-        const userId = localStorage.getItem("userId"); 
+  // Fetch dashboard data on component mount
+  useEffect(()=>{
+    const userId = localStorage.getItem("userId"); 
+    api.dashboard.overview(userId).then((res)=>{setDashboardData(res)}).catch(err=>{console.log(err)}).finally(()=>{setLoading(false)});
+  },[])
 
-        const res = await axios.get(
-          `http://localhost:8000/api/v1/dashboard/${userId}`,
-          { withCredentials: true }
-        );
-        setDashboardData(res.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchDashboard();
-  }, []);
 
   const handleNavigate = (courseId) => {
     navigate(`/courses/${courseId}`);

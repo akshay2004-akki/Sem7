@@ -20,6 +20,9 @@ interface Course {
   title: string;
   description: string;
   thumbnail: string;
+  instructorId: {
+    fullName: string;
+  };
 }
 
 interface CarouselProps {
@@ -66,6 +69,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
             variant="outline"
             className="absolute left-4 top-6 rounded-[14px] border border-black/10 text-base md:left-6"
           />
+
           <div className="flex w-full items-center justify-center gap-4">
             <div className="w-full">
               <Swiper
@@ -99,9 +103,24 @@ export const CardCarousel: React.FC<CarouselProps> = ({
               >
                 {courses.map((course) => (
                   <SwiperSlide key={course._id}>
-                    <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-5 shadow-xl w-[280px] sm:w-[320px] flex flex-col items-center justify-end text-left transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40">
-                      {/* Thumbnail */}
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-cyan-400 shadow-md mb-4">
+                    <div
+                      className="
+      bg-white/10 backdrop-blur-xl border border-white/20 
+      rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.25)]
+      w-[280px] sm:w-[320px] flex flex-col items-center
+      transform transition-all duration-500 hover:scale-[1.06]
+      hover:shadow-[0_12px_40px_rgba(56,189,248,0.35)] hover:border-cyan-300/40
+    "
+                    >
+                      {/* Centered Image */}
+                      <div
+                        className="
+        w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden 
+        border border-white/20 shadow-md mb-4 
+        bg-gradient-to-br from-cyan-400/20 to-fuchsia-500/20 
+        backdrop-blur-lg
+      "
+                      >
                         <img
                           src={course.thumbnail}
                           alt={course.title}
@@ -109,22 +128,33 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                         />
                       </div>
 
-                      {/* Title clickable */}
-                      <button
-                        onClick={() => onNavigate?.(course._id)}
-                        className="text-lg hover:text-cyan-400 sm:text-xl font-semibold text-white mb-2"
-                      >
-                        {course.title}
-                      </button>
+                      {/* LEFT-ALIGNED TEXT */}
+                      <div className="w-full text-left">
+                        <button
+                          onClick={() => onNavigate?.(course._id)}
+                          className="
+          text-xl sm:text-2xl font-semibold text-white mb-2 
+          tracking-tight hover:text-cyan-300 transition-colors duration-300
+        "
+                        >
+                          {course.title}
+                        </button>
 
-                      {/* Description */}
-                      <p className="text-gray-300 text-sm sm:text-base line-clamp-3">
-                        {course.description}
-                      </p>
-                      <p className="text-cyan-400 text-sm sm:text-base line-clamp-3">By : {course.instructorId.fullName}</p>
+                        <p className="text-gray-200/80 text-sm sm:text-base leading-relaxed line-clamp-3">
+                          {course.description.slice(0,50)}...
+                        </p>
 
-                      {/* Separator */}
-                      <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full my-3"></div>
+                        <p className="text-sm sm:text-base mt-1 italic">
+                          <span className="text-cyan-300">Instructor : </span><span className="text-white">{course.instructorId.fullName}</span>
+                        </p>
+
+                        <div
+                          className="
+          w-16 h-[3px] bg-gradient-to-r from-cyan-400 to-pink-500 
+          rounded-full my-4 shadow-[0_0_8px_rgba(56,189,248,0.5)]
+        "
+                        />
+                      </div>
                     </div>
                   </SwiperSlide>
                 ))}
