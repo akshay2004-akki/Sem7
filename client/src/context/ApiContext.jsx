@@ -116,8 +116,7 @@ export const ApiProvider = ({ children }) => {
 
     // ---------------- FOLLOW ----------------
     follow: {
-      followUser: (userId) => post(`/follow/followUser/${userId}`),
-      unfollowUser: (userId) => remove(`/follow/unfollowUser/${userId}`),
+      followUnFollowUser: (currentUserId, instructorId) => post(`/follow/followUnfollow/${currentUserId}/${instructorId}`),
       followers: (userId) => get(`/follow/followers/${userId}`),
       following: (userId) => get(`/follow/getFollowing/${userId}`),
     },

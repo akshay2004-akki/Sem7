@@ -21,106 +21,100 @@ const InstructorProfile = () => {
   const currentUserId = localStorage.getItem("userId");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-  const {api} = useApi()
+  const { api } = useApi();
 
-  // Fetch instructor profile, followers, and courses
   // =============================
-// 1️⃣ Fetch Instructor Profile
-// =============================
-useEffect(() => {
-  const loadInstructor = async () => {
-    try {
-      const data = await api.instructor.getProfile(instructorId);
-      console.log(data); 
-      
-      setInstructor(data.instructorProfile);
-    } catch (err) {
-      console.error("Error loading instructor profile:", err);
-    }
-  };
-
-  loadInstructor();
-}, [instructorId]);
-
-
-// =============================
-// 2️⃣ Fetch Followers
-// =============================
-useEffect(() => {
-  const loadFollowers = async () => {
-    try {
-      const data = await api.follow.followers(instructorId);
-      console.log(data); 
-      
-      setFollowersCount(data.followersCount);
-
-      if (currentUserId) {
-        const ids = data.followers.map((f) => f.follower.toString());
-        setIsFollowing(ids.includes(currentUserId)); 
+  // 1️⃣ Fetch Instructor Profile
+  // =============================
+  useEffect(() => {
+    const loadInstructor = async () => {
+      try {
+        const data = await api.instructor.getProfile(instructorId);
+        setInstructor(data.instructorProfile);
+      } catch (err) {
+        console.error("Error loading instructor profile:", err);
       }
-    } catch (err) {
-      console.error("Error loading followers:", err);
+    };
+
+    loadInstructor();
+  }, [instructorId]);
+
+  // =============================
+  // 2️⃣ Fetch Followers
+  // =============================
+  useEffect(() => {
+    const loadFollowers = async () => {
+      try {
+        const data = await api.follow.followers(instructorId);
+
+        setFollowersCount(data.followersCount);
+
+        if (currentUserId) {
+          const ids = data.followers.map((f) => f.follower.toString());
+          setIsFollowing(ids.includes(currentUserId));
+        }
+      } catch (err) {
+        console.error("Error loading followers:", err);
+      }
+    };
+
+    loadFollowers();
+  }, [instructorId, currentUserId]);
+
+  // =============================
+  // 3️⃣ Fetch Instructor Courses
+  // =============================
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const data = await api.instructor.getCourses(instructorId, page);
+
+        setInstructor((prev) => {
+          if (!prev)
+            return { courses: data.courses, instructorId: {}, bio: "", rating: 0 };
+          return { ...prev, courses: data.courses };
+        });
+
+        setTotalCourses(data.totalCourses);
+        setTotalPages(data.totalPages);
+      } catch (err) {
+        console.error("Error loading courses:", err);
+      }
+    };
+
+    loadCourses();
+  }, [instructorId, page]);
+
+  // =============================
+  // 4️⃣ Check If User Already Rated
+  // =============================
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const checkRating = async () => {
+      try {
+        const res = await api.instructor.hasRated(instructorId, currentUserId);
+        setHasRated(res.hasRated);
+      } catch (err) {
+        console.error("Error checking rating:", err);
+      }
+    };
+
+    checkRating();
+  }, [instructorId, currentUserId]);
+
+  // =============================
+  // 5️⃣ Stop global loading
+  // =============================
+  useEffect(() => {
+    if (instructor && instructor.instructorId) {
+      setLoading(false);
     }
-  };
+  }, [instructor]);
 
-  loadFollowers();
-}, [instructorId, currentUserId]);
-
-
-// =============================
-// 3️⃣ Fetch Instructor Courses
-// =============================
-useEffect(() => {
-  const loadCourses = async () => {
-    try {
-      const data = await api.instructor.getCourses(instructorId, page);
-      console.log(data);
-      
-
-      setInstructor((prev) =>
-        prev ? { ...prev, courses: data.courses } : null
-      );
-
-      setTotalCourses(data.totalCourses);
-      setTotalPages(data.totalPages); // backend does not support pagination here
-    } catch (err) {
-      console.error("Error loading courses:", err);
-    }
-  };
-
-  loadCourses();
-}, [instructorId, page]);
-
-
-// =============================
-// 4️⃣ Check If User Already Rated
-// =============================
-useEffect(() => {
-  if (!currentUserId) return;
-
-  const checkRating = async () => {
-    try {
-      const res = await api.instructor.hasRated(instructorId, currentUserId);
-      setHasRated(res.hasRated);
-    } catch (err) {
-      console.error("Error checking rating:", err);
-    }
-  };
-
-  checkRating();
-}, [instructorId, currentUserId]);
-
-
-// =============================
-// 5️⃣ Stop global loading when everything fetched
-// =============================
-useEffect(() => {
-  if (instructor !== null) {
-    setLoading(false);
-  }
-}, [instructor]);
-
-
+  // =============================
+  // FOLLOW / UNFOLLOW
+  // =============================
   const handleFollowToggle = async () => {
     if (!currentUserId) {
       alert("You must be logged in to follow an instructor.");
@@ -128,20 +122,19 @@ useEffect(() => {
     }
 
     try {
-      await axios.post(
-        `http://localhost:8000/api/v1/follow/followUnfollow/${currentUserId}/${instructorId}`,
-        {},
-        { withCredentials: true }
-      );
+      await api.follow.followUnFollowUser(currentUserId, instructorId);
 
       setIsFollowing((prev) => !prev);
-      setFollowersCount((prev) => (isFollowing ? prev - 1 : prev + 1));
+      setFollowersCount((prev) => (!isFollowing ? prev + 1 : prev - 1));
     } catch (err) {
       console.error("Error following/unfollowing:", err.response || err);
       alert(err.response?.data?.message || "Something went wrong");
     }
   };
 
+  // =============================
+  // ⭐ Submit Rating
+  // =============================
   const handleRatingSubmit = async (ratingValue) => {
     if (!isLoggedIn) return alert("Login to rate the instructor.");
     if (hasRated) return alert("You have already rated this instructor.");
@@ -162,10 +155,12 @@ useEffect(() => {
     }
   };
 
+  // =============================
+  // LOADING UI
+  // =============================
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white px-6 md:px-12 py-12 animate-pulse">
-        {/* Skeleton Loader */}
         <div className="max-w-5xl mx-auto bg-zinc-900 rounded-2xl p-8 shadow-xl flex flex-col md:flex-row items-center gap-8">
           <div className="w-40 h-40 rounded-full bg-gray-700"></div>
           <div className="flex-1 space-y-4 w-full">
@@ -177,6 +172,9 @@ useEffect(() => {
     );
   }
 
+  // =============================
+  // FINAL RENDER
+  // =============================
   return (
     <div className="min-h-screen bg-black text-white px-6 pt-[60px] md:px-12 py-12">
       {/* Header */}
@@ -185,8 +183,8 @@ useEffect(() => {
           {/* Profile Image */}
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-cyan-500 shadow-md">
             <img
-              src={instructor?.instructorId.avatar || "/default-avatar.png"}
-              alt={instructor?.instructorId.fullName}
+              src={instructor?.instructorId?.avatar || "/default-avatar.png"}
+              alt={instructor?.instructorId?.fullName}
               className="w-full h-full object-cover"
             />
           </div>
@@ -194,30 +192,30 @@ useEffect(() => {
           {/* Instructor Info */}
           <div className="flex-1 space-y-3">
             <h1 className="text-3xl font-bold text-cyan-400">
-              {instructor.instructorId.fullName}
+              {instructor?.instructorId?.fullName}
             </h1>
-            <p className="text-gray-400">{instructor.bio}</p>
+            <p className="text-gray-400">{instructor?.bio}</p>
 
             <div className="flex items-center gap-6 mt-3 text-gray-300">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5" /> Courses: {totalCourses}
               </div>
               <div className="flex items-center gap-2">
-                ⭐ Rating: {instructor.rating.toFixed(1)}
+                ⭐ Rating: {instructor?.rating?.toFixed(1) || 0}
               </div>
             </div>
 
             {/* Followers and Follow Button */}
             <div className="mt-4 flex items-center gap-4">
-              {/* Followers count - always visible */}
+              {/* Followers count */}
               <div className="flex items-center gap-2 bg-cyan-600 px-3 py-1 rounded-lg">
                 <User className="w-5 h-5" /> {followersCount} Followers
               </div>
 
-              {/* Follow button - only if logged in and not the instructor */}
+              {/* Follow button */}
               {isLoggedIn &&
                 currentUserId.toString() !==
-                  instructor.instructorId._id?.toString() && (
+                  instructor?.instructorId?._id?.toString() && (
                   <button
                     onClick={handleFollowToggle}
                     className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
@@ -234,7 +232,7 @@ useEffect(() => {
             {/* ⭐ Rating Section */}
             {isLoggedIn &&
               currentUserId.toString() !==
-                instructor.instructorId._id.toString() && (
+                instructor?.instructorId?._id?.toString() && (
                 <div className="mt-5">
                   <p className="text-gray-300 font-medium mb-2">
                     Rate this instructor:
@@ -270,10 +268,10 @@ useEffect(() => {
       <div className="max-w-5xl mx-auto mt-12">
         <h2 className="text-2xl font-semibold mb-6 text-cyan-400 flex items-center gap-2">
           <BookOpen className="w-6 h-6" /> Courses by{" "}
-          {instructor.instructorId.fullName}
+          {instructor?.instructorId?.fullName}
         </h2>
 
-        {instructor.courses && instructor.courses.length > 0 ? (
+        {instructor?.courses && instructor.courses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {instructor.courses.map((course) => (
               <div
