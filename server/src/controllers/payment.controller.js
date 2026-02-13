@@ -3,7 +3,7 @@ import { User } from "../models/user.model.js";
 import { Course } from "../models/courses.model.js";
 import { ApiError } from "../utils/ApiError.js";
 // import { ApiResponse } from "../utils/ApiResponse.js";
-import  asyncHandler  from "../utils/asyncHandler.js";
+import  asyncHandler  from "../utils/asynchandler.js";
 import crypto from "crypto";
 
 // --- 1. Create a Razorpay Order ---

@@ -2,7 +2,7 @@
 import { isValidObjectId } from "mongoose";
 import { Follow } from "../models/follow.model.js";
 import {ApiError} from "../utils/ApiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 
 export const followAndUnfollowUser = asyncHandler(async(req,res)=>{
     const {followerId, followingId} = req.params;

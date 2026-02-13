@@ -1,6 +1,6 @@
 import {Section} from '../models/section.model.js';
 import {Lecture} from '../models/lecture.model.js';
-import asyncHandler from '../utils/asyncHandler.js';
+import asyncHandler from '../utils/asynchandler.js';
 import {ApiError} from '../utils/ApiError.js';
 import {isValidObjectId} from 'mongoose';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';

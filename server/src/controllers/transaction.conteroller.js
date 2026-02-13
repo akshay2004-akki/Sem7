@@ -1,4 +1,4 @@
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 import {Transaction} from "../models/transaction.model.js";
 import {Course} from "../models/courses.model.js";
 import {User} from "../models/user.model.js";

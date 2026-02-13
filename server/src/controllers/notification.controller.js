@@ -1,5 +1,5 @@
 import { Notification } from "../models/notifiation.model.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 
 export const sendNotification = async (userIds, message, link) => {
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) return;

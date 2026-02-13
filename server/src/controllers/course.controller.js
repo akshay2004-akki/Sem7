@@ -1,4 +1,4 @@
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Course } from "../models/courses.model.js";
 import { isValidObjectId } from "mongoose";

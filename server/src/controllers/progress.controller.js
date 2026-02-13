@@ -1,7 +1,7 @@
 import { isValidObjectId } from "mongoose";
 import { Progress } from "../models/progress.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 
 export const updateProgress = asyncHandler(async (req, res) => {
   const { courseId, lectureId, status, watchedDuration } = req.body;

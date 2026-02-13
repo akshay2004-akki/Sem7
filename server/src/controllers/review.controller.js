@@ -1,7 +1,7 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Review } from "../models/review.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js";
 
 export const createReview = asyncHandler(async (req, res) => {
   const { courseId, userId } = req.params;
