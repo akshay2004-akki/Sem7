@@ -28,7 +28,7 @@ function ManageCourse() {
     const fetchCourse = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/v1/courses/getCourseById/${courseId}`,
+          `https://sem7-pux8.onrender.com/api/v1/courses/getCourseById/${courseId}`,
           { withCredentials: true }
         );
         setCourse(res.data.course);
@@ -67,7 +67,7 @@ function ManageCourse() {
       }
 
       const res = await axios.post(
-        `http://localhost:8000/api/v1/lectures/addlecture/${selectedSection}`,
+        `https://sem7-pux8.onrender.com/api/v1/lectures/addlecture/${selectedSection}`,
         formData,
         {
           withCredentials: true,
@@ -95,7 +95,7 @@ function ManageCourse() {
 
   const deleteLecture = async (lectureId) => {
     const res = await axios.delete(
-      `http://localhost:8000/api/v1/lectures/deleteLecture/${lectureId}`,
+      `https://sem7-pux8.onrender.com/api/v1/lectures/deleteLecture/${lectureId}`,
       { withCredentials: true }
     );
     console.log(res.data);
@@ -121,7 +121,7 @@ function ManageCourse() {
     if (!newSectionTitle) return;
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/sections/addSection/${course._id}`,
+        `https://sem7-pux8.onrender.com/api/v1/sections/addSection/${course._id}`,
         { title: newSectionTitle },
         { withCredentials: true }
       );
@@ -152,7 +152,7 @@ function ManageCourse() {
 
   const handleSectionDelete = async(sectionId)=>{
     try {
-      const res = await axios.delete(`http://localhost:8000/api/v1/sections/deleteSection/${sectionId}`, {withCredentials:true});
+      const res = await axios.delete(`https://sem7-pux8.onrender.com/api/v1/sections/deleteSection/${sectionId}`, {withCredentials:true});
       console.log(res.data);
         setCourse((prev) => {
             const updatedSections = prev.sections.filter((sec) => sec._id !== sectionId);

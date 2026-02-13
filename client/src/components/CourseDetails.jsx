@@ -152,7 +152,7 @@ const CourseDetails = () => {
     }
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/reviews/${courseId}/${userId}`,
+        `https://sem7-pux8.onrender.com/api/v1/reviews/${courseId}/${userId}`,
         newReview,
         { withCredentials: true }
       );

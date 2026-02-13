@@ -35,13 +35,13 @@ export default function UserProfile() {
     const fetchUser = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/v1/users/profile",
+          "https://sem7-pux8.onrender.com/api/v1/users/profile",
           { withCredentials: true }
         );
         setUser(res.data.user);
 
         const res2 = await axios.get(
-          `http://localhost:8000/api/v1/courses/getInstructorCourses/${res.data.user._id}`,
+          `https://sem7-pux8.onrender.com/api/v1/courses/getInstructorCourses/${res.data.user._id}`,
           { withCredentials: true }
         );
         setInstructorCorses(res2.data.courses);
@@ -119,7 +119,7 @@ export default function UserProfile() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/users/upload-avatar",
+        "https://sem7-pux8.onrender.com/api/v1/users/upload-avatar",
         formData,
         {
           withCredentials: true,
@@ -161,7 +161,7 @@ export default function UserProfile() {
     setIsPasswordUpdating(true);
     try {
       const res = await axios.patch(
-        "http://localhost:8000/api/v1/users/change-password",
+        "https://sem7-pux8.onrender.com/api/v1/users/change-password",
         { oldPassword: currentPassword, newPassword: newPassword },
         { withCredentials: true }
       );
@@ -222,7 +222,7 @@ export default function UserProfile() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/courses/createCourse",
+        "https://sem7-pux8.onrender.com/api/v1/courses/createCourse",
         formData,
         {
           withCredentials: true,
@@ -241,7 +241,7 @@ export default function UserProfile() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/instructor/create",
+        "https://sem7-pux8.onrender.com/api/v1/instructor/create",
         { bio },
         { withCredentials: true }
       );

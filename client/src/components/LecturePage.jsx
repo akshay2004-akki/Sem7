@@ -19,7 +19,7 @@ const LecturePage = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:8000/api/v1/courses/getCourseById/${courseId}`,
+          `https://sem7-pux8.onrender.com/api/v1/courses/getCourseById/${courseId}`,
           { withCredentials: true }
         );
         const course = res.data.course;
@@ -59,7 +59,7 @@ const LecturePage = () => {
 
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/progress/update",
+        "https://sem7-pux8.onrender.com/api/v1/progress/update",
         {
           courseId,
           lectureId: currentLecture._id,

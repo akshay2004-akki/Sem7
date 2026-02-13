@@ -28,7 +28,7 @@ export default function LoginSection() {
       return;
     }
     try {
-      const res = await axios.post('http://localhost:8000/api/v1/users/login', {email, password}, {withCredentials: true});
+      const res = await axios.post('https://sem7-pux8.onrender.com/api/v1/users/login', {email, password}, {withCredentials: true});
       console.log(res); 
       
       if (res.status===200) {

@@ -59,7 +59,7 @@ export default function Navbar() {
     setIsLoggedIn(false);
     setProfileOpen(false);
     await axios.post(
-      "http://localhost:8000/api/v1/users/logout",
+      "https://sem7-pux8.onrender.com/api/v1/users/logout",
       {},
       { withCredentials: true }
     );
@@ -83,7 +83,7 @@ export default function Navbar() {
       try {
         setIsSearching(true);
         const res = await axios.get(
-          `http://localhost:8000/api/v1/courses/browseCourses?search=${query}`,
+          `https://sem7-pux8.onrender.com/api/v1/courses/browseCourses?search=${query}`,
           { withCredentials: true }
         );
         console.log(res.data);

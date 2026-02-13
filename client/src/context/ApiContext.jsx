@@ -8,7 +8,7 @@ export const ApiProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const axiosClient = axios.create({
-    baseURL: "http://localhost:8000/api/v1", 
+    baseURL: "https://sem7-pux8.onrender.com/api/v1", 
     withCredentials: true,
   });
 

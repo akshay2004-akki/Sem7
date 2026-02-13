@@ -112,7 +112,7 @@ const Instructors = () => {
     const fetchTopInstructors = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/v1/instructor/top`,
+          `https://sem7-pux8.onrender.com/api/v1/instructor/top`,
           { withCredentials: true }
         );
         console.log("Fetched top instructors:", res.data);

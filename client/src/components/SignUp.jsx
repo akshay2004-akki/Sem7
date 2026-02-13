@@ -30,7 +30,7 @@ export default function SignUpSection() {
     }
 
     try {
-      const res = await axios.post('http://localhost:8000/api/v1/users/register', {
+      const res = await axios.post('https://sem7-pux8.onrender.com/api/v1/users/register', {
         fullName,
         email,
         password,
