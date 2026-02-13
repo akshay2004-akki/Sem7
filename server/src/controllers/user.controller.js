@@ -1,5 +1,5 @@
 import { ApiError } from "../utils/ApiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asynchandler.js"
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { isValidObjectId } from "mongoose";
