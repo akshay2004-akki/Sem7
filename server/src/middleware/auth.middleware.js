@@ -12,7 +12,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     // Priority: cookies -> Authorization header
     const token =
-      req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
     console.log("accessToken:", token);

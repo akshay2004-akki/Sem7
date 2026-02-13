@@ -29,7 +29,7 @@ export default function LoginSection() {
     }
     try {
       const res = await axios.post('http://localhost:8000/api/v1/users/login', {email, password}, {withCredentials: true});
-      console.log(res);
+      console.log(res); 
       
       if (res.status===200) {
         // --- KEY CHANGE: Save login state to local storage ---
@@ -40,6 +40,7 @@ export default function LoginSection() {
         if (res.data.loggedInUser && res.data.loggedInUser.avatar) {
           localStorage.setItem('userAvatar', res.data.loggedInUser.avatar);
         }
+        localStorage.setItem("accessToken", res.data.token); // Save access token for future API calls
 
         alert('Login successful!');
         // Redirect to the home page after successful login

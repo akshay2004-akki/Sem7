@@ -8,9 +8,20 @@ export const ApiProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const axiosClient = axios.create({
-    baseURL: "http://localhost:8000/api/v1",
+    baseURL: "http://localhost:8000/api/v1", 
     withCredentials: true,
   });
+
+  axiosClient.interceptors.request.use((config)=>{
+    const token = localStorage.getItem("accessToken");
+    if(token){
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+
+  },
+  (error) => Promise.reject(error)
+)
 
   const callApi = useCallback(async (method, url, data = {}, conifg) => {
     try {
