@@ -56,12 +56,13 @@ export default function Navbar() {
 
   // --- Logout handler ---
   const handleLogout = async () => {
+    const token = localStorage.getItem("accessToken");
     setIsLoggedIn(false);
     setProfileOpen(false);
     await axios.post(
       "https://sem7-pux8.onrender.com/api/v1/users/logout",
       {},
-      { withCredentials: true }
+      { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
     );
     localStorage.removeItem("isLoggedIn");
     window.location.href = "/";

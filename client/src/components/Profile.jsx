@@ -27,22 +27,39 @@ export default function UserProfile() {
   const [thumbnail, setThumbnail] = useState(null);
   const [instructorCourses, setInstructorCorses] = useState([]);
   const [bio, setBio] = useState("");
+  const [token, setToken] = useState(localStorage.getItem("accessToken") || "");
 
   const navigate = useNavigate();
+  useEffect(()=>{
+    const token = localStorage.getItem("accessToken");
+    if(token){
+      setToken(token);
+    } else {  
+      navigate("/login");
+    }
+  },[])
 
   // Fetch user data from backend
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        
         const res = await axios.get(
           "https://sem7-pux8.onrender.com/api/v1/users/profile",
-          { withCredentials: true }
+          { 
+            withCredentials: true, 
+            headers:{
+              Authorization : `Bearer ${token}`
+            }
+          }
         );
         setUser(res.data.user);
 
         const res2 = await axios.get(
           `https://sem7-pux8.onrender.com/api/v1/courses/getInstructorCourses/${res.data.user._id}`,
-          { withCredentials: true }
+          { withCredentials: true,headers:{
+              Authorization : `Bearer ${token}`
+            } }
         );
         setInstructorCorses(res2.data.courses);
       } catch (err) {
@@ -125,6 +142,7 @@ export default function UserProfile() {
           withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization : `Bearer ${token}`
           },
         }
       );
@@ -163,7 +181,12 @@ export default function UserProfile() {
       const res = await axios.patch(
         "https://sem7-pux8.onrender.com/api/v1/users/change-password",
         { oldPassword: currentPassword, newPassword: newPassword },
-        { withCredentials: true }
+        { 
+          withCredentials: true,
+          headers:{
+            Authorization : `Bearer ${token}`
+          }
+        }
       );
 
       showNotification(
@@ -226,7 +249,7 @@ export default function UserProfile() {
         formData,
         {
           withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data", Authorization : `Bearer ${token}` },
         }
       );
       alert("Course created successfully!");
@@ -243,7 +266,7 @@ export default function UserProfile() {
       const res = await axios.post(
         "https://sem7-pux8.onrender.com/api/v1/instructor/create",
         { bio },
-        { withCredentials: true }
+        { withCredentials: true, headers:{ Authorization : `Bearer ${token}` } }
       );
       console.log(res.data);
     } catch (err) {
